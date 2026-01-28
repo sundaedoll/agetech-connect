@@ -1,29 +1,56 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Professional, calm color palette for Agetech Connect
+ * Healthcare-adjacent, trustworthy, accessible design
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Primary accent color - calm, professional blue
+const primaryColor = '#2563EB'; // Trustworthy blue
+const primaryColorDark = '#3B82F6';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#1F2937', // Dark gray for readability
+    textSecondary: '#6B7280', // Medium gray for secondary text
+    background: '#FFFFFF',
+    backgroundSecondary: '#F9FAFB', // Subtle gray background
+    tint: primaryColor,
+    icon: '#6B7280',
+    tabIconDefault: '#9CA3AF',
+    tabIconSelected: primaryColor,
+    border: '#E5E7EB', // Subtle borders
+    cardBackground: '#FFFFFF',
+    shadow: 'rgba(0, 0, 0, 0.1)',
+    // Status colors
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    // Stage badges
+    pilot: '#8B5CF6', // Purple
+    earlyCommercial: '#3B82F6', // Blue
+    mature: '#10B981', // Green
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#F9FAFB',
+    textSecondary: '#D1D5DB',
+    background: '#111827',
+    backgroundSecondary: '#1F2937',
+    tint: primaryColorDark,
+    icon: '#9CA3AF',
+    tabIconDefault: '#6B7280',
+    tabIconSelected: primaryColorDark,
+    border: '#374151',
+    cardBackground: '#1F2937',
+    shadow: 'rgba(0, 0, 0, 0.3)',
+    // Status colors
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    // Stage badges
+    pilot: '#A78BFA',
+    earlyCommercial: '#60A5FA',
+    mature: '#34D399',
   },
 };
 
