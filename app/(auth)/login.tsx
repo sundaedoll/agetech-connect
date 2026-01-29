@@ -34,8 +34,8 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (validate()) {
-      // Navigate to main app
-      router.replace('../(tabs)' as any);
+      // Navigate to onboarding first, then to main app
+      router.replace('../(onboarding)/user-type' as any);
     }
   };
 

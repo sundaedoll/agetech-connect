@@ -47,7 +47,7 @@ export default function SignUpScreen() {
   const handleSignUp = () => {
     if (validate()) {
       // Navigate to onboarding
-      router.push('../onboarding/user-type' as any);
+      router.replace('../(onboarding)/user-type' as any);
     }
   };
 

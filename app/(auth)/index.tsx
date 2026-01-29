@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
-export default function IndexScreen() {
+// Redirect to welcome screen
+export default function AuthIndex() {
   const hasNavigated = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -15,8 +16,7 @@ export default function IndexScreen() {
 
       try {
         hasNavigated.current = true;
-        // Redirect to explore (swipe cards) as the main/default tab
-        router.replace('./explore' as any);
+        router.replace('./welcome' as any);
       } catch (error: any) {
         // If error is about router not being ready, retry
         if (error?.message?.includes('mounting') || error?.message?.includes('Root Layout')) {
@@ -50,6 +50,5 @@ export default function IndexScreen() {
     };
   }, []);
 
-  // Return a minimal view while redirecting
   return <View style={{ flex: 1 }} />;
 }

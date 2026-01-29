@@ -19,13 +19,20 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          href: null, // Hide from tab bar - redirects to matches
+          href: null, // Hide from tab bar - redirects to explore
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Swipe',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="sparkles" color={color} />,
         }}
       />
       <Tabs.Screen
         name="matches"
         options={{
-          title: 'Matches',
+          title: 'Your Matches',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.2.fill" color={color} />,
         }}
       />
