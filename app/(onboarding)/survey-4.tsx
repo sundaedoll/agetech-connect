@@ -1,5 +1,6 @@
 /**
- * A. Adoption Readiness - What type of technologies are you open to? (Multi-select)
+ * D. Care Setting (Contextual Filter)
+ * Where will this technology be used? (Multi-select)
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
@@ -16,40 +17,31 @@ const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
 
-const OPTIONS: Array<{ label: string; description: string }> = [
-  {
-    label: "Pilot / research stage",
-    description:
-      "Be among the first to test innovative prototypes and provide feedback to creators.",
-  },
-  {
-    label: "Early commercial / early adopters",
-    description:
-      "Access market-ready solutions that are gaining their first set of users.",
-  },
-  {
-    label: "Fully mature / proven technologies only",
-    description:
-      "Focus on reliable, highly-tested technologies with widespread adoption.",
-  },
+type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
+const OPTIONS: Array<{ label: string; icon: IconName }> = [
+  { label: "Private home", icon: "home" },
+  { label: "Assisted living", icon: "favorite" },
+  { label: "Long-term care", icon: "local-hospital" },
+  { label: "Retirement community", icon: "apartment" },
+  { label: "Community / day programs", icon: "groups" },
 ];
 
 const TOTAL_STEPS = 5;
-const STEP = 1;
+const STEP = 4;
 
-export default function Survey1Screen() {
-  const { state, setAdoptionReadiness } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.adoptionReadiness);
+export default function Survey4Screen() {
+  const { state, setCareSetting } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string[]>(state.careSetting);
 
-  const toggle = (label: string) => {
+  const toggle = (item: string) => {
     setSelected((prev) =>
-      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label],
+      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item],
     );
   };
 
   const handleContinue = () => {
-    setAdoptionReadiness(selected);
-    router.push("./survey-2" as any);
+    setCareSetting(selected);
+    router.push("./survey-5" as any);
   };
 
   return (
@@ -68,10 +60,11 @@ export default function Survey1Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          What type of technologies are you open to?
+          Where will this technology be used?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all that apply to your current facility or household needs.
+          Select all that apply to help us find the best tech matches for your
+          environment.
         </ThemedText>
       </View>
 
@@ -80,7 +73,7 @@ export default function Survey1Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {OPTIONS.map(({ label, description }) => (
+        {OPTIONS.map(({ label, icon }) => (
           <TouchableOpacity
             key={label}
             style={[
@@ -90,12 +83,13 @@ export default function Survey1Screen() {
             onPress={() => toggle(label)}
             activeOpacity={0.8}
           >
-            <View style={styles.optionTextWrap}>
-              <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-              <ThemedText style={styles.optionDescription}>
-                {description}
-              </ThemedText>
-            </View>
+            <MaterialIcons
+              name={icon}
+              size={24}
+              color={selected.includes(label) ? TrustTeal : TEXT_SECONDARY}
+              style={styles.optionIcon}
+            />
+            <ThemedText style={styles.optionLabel}>{label}</ThemedText>
             <View
               style={[
                 styles.checkbox,
@@ -166,17 +160,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionTextWrap: { flex: 1, marginRight: 12 },
+  optionIcon: { marginRight: 14 },
   optionLabel: {
     fontSize: 16,
     fontWeight: "600",
     color: TEXT_PRIMARY,
-    marginBottom: 4,
-  },
-  optionDescription: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    lineHeight: 18,
+    flex: 1,
   },
   checkbox: {
     width: 24,

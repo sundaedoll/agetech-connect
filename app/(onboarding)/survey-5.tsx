@@ -1,5 +1,6 @@
 /**
- * A. Adoption Readiness - What type of technologies are you open to? (Multi-select)
+ * E. Risk Tolerance (Simple)
+ * How comfortable are you trying new technologies? (3-option select)
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
@@ -16,40 +17,20 @@ const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
 
-const OPTIONS: Array<{ label: string; description: string }> = [
-  {
-    label: "Pilot / research stage",
-    description:
-      "Be among the first to test innovative prototypes and provide feedback to creators.",
-  },
-  {
-    label: "Early commercial / early adopters",
-    description:
-      "Access market-ready solutions that are gaining their first set of users.",
-  },
-  {
-    label: "Fully mature / proven technologies only",
-    description:
-      "Focus on reliable, highly-tested technologies with widespread adoption.",
-  },
-];
+const OPTIONS = ["Conservative", "Open", "Very open / early adopter"];
 
 const TOTAL_STEPS = 5;
-const STEP = 1;
+const STEP = 5;
 
-export default function Survey1Screen() {
-  const { state, setAdoptionReadiness } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.adoptionReadiness);
-
-  const toggle = (label: string) => {
-    setSelected((prev) =>
-      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label],
-    );
-  };
+export default function Survey5Screen() {
+  const { state, setRiskTolerance } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string | null>(state.riskTolerance);
 
   const handleContinue = () => {
-    setAdoptionReadiness(selected);
-    router.push("./survey-2" as any);
+    if (selected) {
+      setRiskTolerance(selected);
+      router.replace("../(tabs)" as any);
+    }
   };
 
   return (
@@ -68,10 +49,11 @@ export default function Survey1Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          What type of technologies are you open to?
+          How comfortable are you trying new technologies?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all that apply to your current facility or household needs.
+          This helps us match you with innovators whose products fit your
+          preferred pace of adoption and risk profile.
         </ThemedText>
       </View>
 
@@ -80,48 +62,55 @@ export default function Survey1Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {OPTIONS.map(({ label, description }) => (
+        {OPTIONS.map((label) => (
           <TouchableOpacity
             key={label}
             style={[
               styles.optionCard,
-              selected.includes(label) && styles.optionCardSelected,
+              selected === label && styles.optionCardSelected,
             ]}
-            onPress={() => toggle(label)}
+            onPress={() => setSelected(label)}
             activeOpacity={0.8}
           >
-            <View style={styles.optionTextWrap}>
-              <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-              <ThemedText style={styles.optionDescription}>
-                {description}
-              </ThemedText>
-            </View>
+            <ThemedText style={styles.optionLabel}>{label}</ThemedText>
             <View
               style={[
-                styles.checkbox,
-                selected.includes(label) && styles.checkboxSelected,
+                styles.radioOuter,
+                selected === label && styles.radioOuterSelected,
               ]}
             >
-              {selected.includes(label) && (
-                <MaterialIcons name="check" size={16} color="#FFFFFF" />
-              )}
+              {selected === label && <View style={styles.radioInner} />}
             </View>
           </TouchableOpacity>
         ))}
+
+        <View style={styles.infoCard}>
+          <MaterialIcons
+            name="rocket-launch"
+            size={28}
+            color={TrustTeal}
+            style={styles.infoCardIcon}
+          />
+          <View style={styles.infoCardTextWrap}>
+            <ThemedText style={styles.infoCardTitle}>
+              Innovation Matcher
+            </ThemedText>
+            <ThemedText style={styles.infoCardSubtitle}>
+              We'll show you tech that fits this profile.
+            </ThemedText>
+          </View>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[
-            styles.continueBtn,
-            selected.length === 0 && styles.continueBtnDisabled,
-          ]}
+          style={[styles.continueBtn, !selected && styles.continueBtnDisabled]}
           onPress={handleContinue}
-          disabled={selected.length === 0}
+          disabled={!selected}
           activeOpacity={0.8}
         >
-          <ThemedText style={styles.continueBtnText}>Continue</ThemedText>
-          <MaterialIcons name="arrow-forward" size={22} color="#FFFFFF" />
+          <MaterialIcons name="check" size={22} color="#FFFFFF" />
+          <ThemedText style={styles.continueBtnText}>Finish Setup</ThemedText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -166,30 +155,49 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionTextWrap: { flex: 1, marginRight: 12 },
   optionLabel: {
     fontSize: 16,
     fontWeight: "600",
     color: TEXT_PRIMARY,
-    marginBottom: 4,
+    flex: 1,
   },
-  optionDescription: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    lineHeight: 18,
-  },
-  checkbox: {
+  radioOuter: {
     width: 24,
     height: 24,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxSelected: {
+  radioOuterSelected: { borderColor: TrustTeal },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: TrustTeal,
-    borderColor: TrustTeal,
+  },
+  infoCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: CARD_BG,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 16,
+    marginTop: 8,
+  },
+  infoCardIcon: { marginRight: 14 },
+  infoCardTextWrap: { flex: 1 },
+  infoCardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: TEXT_PRIMARY,
+    marginBottom: 4,
+  },
+  infoCardSubtitle: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
   },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {

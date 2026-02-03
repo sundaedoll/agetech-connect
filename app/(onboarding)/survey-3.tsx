@@ -1,9 +1,10 @@
 /**
- * A. Adoption Readiness - What type of technologies are you open to? (Multi-select)
+ * C. Technology Categories - What types of aging technologies are you interested in? (Multi-select)
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -14,42 +15,39 @@ const BG = "#1a1f2e";
 const CARD_BG = "#364652";
 const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
+const ICON_TINT = "#5b9aa0";
 
-const OPTIONS: Array<{ label: string; description: string }> = [
-  {
-    label: "Pilot / research stage",
-    description:
-      "Be among the first to test innovative prototypes and provide feedback to creators.",
-  },
-  {
-    label: "Early commercial / early adopters",
-    description:
-      "Access market-ready solutions that are gaining their first set of users.",
-  },
-  {
-    label: "Fully mature / proven technologies only",
-    description:
-      "Focus on reliable, highly-tested technologies with widespread adoption.",
-  },
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+
+const OPTIONS: Array<{ label: string; icon: IconName }> = [
+  { label: "Assistive technology", icon: "arm-flex" },
+  { label: "Long-term care solutions", icon: "home-heart" },
+  { label: "Retirement living solutions", icon: "home-city" },
+  { label: "Mobility & fall prevention", icon: "walk" },
+  { label: "Social connection & companionship", icon: "account-group" },
+  { label: "Cognitive / dementia support", icon: "head-heart" },
+  { label: "Remote monitoring & safety", icon: "shield-check" },
+  { label: "Finance / planning / care coordination", icon: "chart-box" },
 ];
 
 const TOTAL_STEPS = 5;
-const STEP = 1;
+const STEP = 3;
 
-export default function Survey1Screen() {
-  const { state, setAdoptionReadiness } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.adoptionReadiness);
+export default function Survey3Screen() {
+  const { state, setTechnologyCategories } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string[]>(
+    state.technologyCategories,
+  );
 
-  const toggle = (label: string) => {
+  const toggle = (item: string) => {
     setSelected((prev) =>
-      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label],
+      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item],
     );
   };
 
   const handleContinue = () => {
-    setAdoptionReadiness(selected);
-    router.push("./survey-2" as any);
+    setTechnologyCategories(selected);
+    router.push("./survey-4" as any);
   };
 
   return (
@@ -68,10 +66,10 @@ export default function Survey1Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          What type of technologies are you open to?
+          What types of aging technologies are you interested in?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all that apply to your current facility or household needs.
+          Select all that apply to personalize your matches.
         </ThemedText>
       </View>
 
@@ -80,7 +78,7 @@ export default function Survey1Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {OPTIONS.map(({ label, description }) => (
+        {OPTIONS.map(({ label, icon }) => (
           <TouchableOpacity
             key={label}
             style={[
@@ -90,22 +88,16 @@ export default function Survey1Screen() {
             onPress={() => toggle(label)}
             activeOpacity={0.8}
           >
-            <View style={styles.optionTextWrap}>
-              <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-              <ThemedText style={styles.optionDescription}>
-                {description}
-              </ThemedText>
-            </View>
-            <View
-              style={[
-                styles.checkbox,
-                selected.includes(label) && styles.checkboxSelected,
-              ]}
-            >
-              {selected.includes(label) && (
-                <MaterialIcons name="check" size={16} color="#FFFFFF" />
-              )}
-            </View>
+            <MaterialCommunityIcons
+              name={icon}
+              size={24}
+              color={selected.includes(label) ? TrustTeal : ICON_TINT}
+              style={styles.optionIcon}
+            />
+            <ThemedText style={styles.optionLabel}>{label}</ThemedText>
+            {selected.includes(label) && (
+              <MaterialIcons name="check-circle" size={24} color={TrustTeal} />
+            )}
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -151,13 +143,12 @@ const styles = StyleSheet.create({
     color: TEXT_PRIMARY,
     marginBottom: 6,
   },
-  subtitle: { fontSize: 14, color: TEXT_SECONDARY },
+  subtitle: { fontSize: 14, color: "#9CA3AF" },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   optionCard: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: CARD_BG,
     borderRadius: 20,
     borderWidth: 1,
@@ -166,17 +157,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionTextWrap: { flex: 1, marginRight: 12 },
+  optionIcon: { marginRight: 14 },
   optionLabel: {
     fontSize: 16,
     fontWeight: "600",
     color: TEXT_PRIMARY,
-    marginBottom: 4,
-  },
-  optionDescription: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    lineHeight: 18,
+    flex: 1,
   },
   checkbox: {
     width: 24,

@@ -1,16 +1,20 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function OnboardingLayout() {
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        presentation: 'card',
-        animation: 'slide_from_right',
-      }}>
+        presentation: "card",
+        animation: "slide_from_right",
+      }}
+    >
       <Stack.Screen name="user-type" />
       <Stack.Screen name="survey-1" />
       <Stack.Screen name="survey-2" />
+      <Stack.Screen name="survey-3" />
+      <Stack.Screen name="survey-4" />
+      <Stack.Screen name="survey-5" />
     </Stack>
   );
 }
