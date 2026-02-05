@@ -9,6 +9,12 @@ export interface OnboardingSurveyState {
   technologyCategories: string[];
   careSetting: string[];
   riskTolerance: string | null;
+  // Innovators & Companies survey
+  technologyStage: string | null;
+  seekingThroughPlatform: string[];
+  innovatorTechnologyCategories: string[];
+  deploymentSetting: string[];
+  readinessForEngagement: string[];
 }
 
 const initialState: OnboardingSurveyState = {
@@ -18,6 +24,11 @@ const initialState: OnboardingSurveyState = {
   technologyCategories: [],
   careSetting: [],
   riskTolerance: null,
+  technologyStage: null,
+  seekingThroughPlatform: [],
+  innovatorTechnologyCategories: [],
+  deploymentSetting: [],
+  readinessForEngagement: [],
 };
 
 type SurveyContextValue = {
@@ -28,6 +39,11 @@ type SurveyContextValue = {
   setTechnologyCategories: (v: string[]) => void;
   setCareSetting: (v: string[]) => void;
   setRiskTolerance: (v: string | null) => void;
+  setTechnologyStage: (v: string | null) => void;
+  setSeekingThroughPlatform: (v: string[]) => void;
+  setInnovatorTechnologyCategories: (v: string[]) => void;
+  setDeploymentSetting: (v: string[]) => void;
+  setReadinessForEngagement: (v: string[]) => void;
   reset: () => void;
 };
 
@@ -60,6 +76,26 @@ export function OnboardingSurveyProvider({ children }: { children: React.ReactNo
     setState((s) => ({ ...s, riskTolerance }));
   }, []);
 
+  const setTechnologyStage = useCallback((technologyStage: string | null) => {
+    setState((s) => ({ ...s, technologyStage }));
+  }, []);
+
+  const setSeekingThroughPlatform = useCallback((seekingThroughPlatform: string[]) => {
+    setState((s) => ({ ...s, seekingThroughPlatform }));
+  }, []);
+
+  const setInnovatorTechnologyCategories = useCallback((innovatorTechnologyCategories: string[]) => {
+    setState((s) => ({ ...s, innovatorTechnologyCategories }));
+  }, []);
+
+  const setDeploymentSetting = useCallback((deploymentSetting: string[]) => {
+    setState((s) => ({ ...s, deploymentSetting }));
+  }, []);
+
+  const setReadinessForEngagement = useCallback((readinessForEngagement: string[]) => {
+    setState((s) => ({ ...s, readinessForEngagement }));
+  }, []);
+
   const reset = useCallback(() => {
     setState(initialState);
   }, []);
@@ -74,6 +110,11 @@ export function OnboardingSurveyProvider({ children }: { children: React.ReactNo
         setTechnologyCategories,
         setCareSetting,
         setRiskTolerance,
+        setTechnologyStage,
+        setSeekingThroughPlatform,
+        setInnovatorTechnologyCategories,
+        setDeploymentSetting,
+        setReadinessForEngagement,
         reset,
       }}>
       {children}

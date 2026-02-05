@@ -1,10 +1,10 @@
 /**
- * D. Care Setting (Contextual Filter)
- * Where will this technology be used? (Multi-select)
+ * Innovators & Companies: C. Technology Category - Multi-select
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -16,37 +16,30 @@ const CARD_BG = "#364652";
 const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
-
-type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
 const CARD_BORDER = TrustTeal;
+const ICON_TINT = "#5b9aa0";
 
-const SECTIONS: Array<{
-  title: string;
-  options: Array<{ label: string; icon: IconName }>;
-}> = [
-  {
-    title: "Home & independent",
-    options: [
-      { label: "Private home", icon: "home" },
-      { label: "Retirement community", icon: "apartment" },
-    ],
-  },
-  {
-    title: "Care & community",
-    options: [
-      { label: "Assisted living", icon: "favorite" },
-      { label: "Long-term care", icon: "local-hospital" },
-      { label: "Community / day programs", icon: "groups" },
-    ],
-  },
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+
+const OPTIONS: Array<{ label: string; description: string; icon: IconName }> = [
+  { label: "Assistive technology", description: "Smart home tools & aids", icon: "arm-flex" },
+  { label: "Long-term care solutions", description: "Care & living solutions", icon: "home-heart" },
+  { label: "Retirement living solutions", description: "Independent living", icon: "home-city" },
+  { label: "Mobility & fall prevention", description: "Fall prevention & safety", icon: "walk" },
+  { label: "Social connection & companionship", description: "Loneliness & connection", icon: "account-group" },
+  { label: "Cognitive / dementia support", description: "Memory & cognitive aids", icon: "head-heart" },
+  { label: "Remote monitoring & safety", description: "Health & remote tracking", icon: "shield-check" },
+  { label: "Finance / planning / care coordination", description: "Care coordination", icon: "chart-box" },
 ];
 
 const TOTAL_STEPS = 5;
-const STEP = 4;
+const STEP = 3;
 
-export default function Survey4Screen() {
-  const { state, setCareSetting } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.careSetting);
+export default function InnovatorSurvey3Screen() {
+  const { state, setInnovatorTechnologyCategories } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string[]>(
+    state.innovatorTechnologyCategories,
+  );
 
   const toggle = (item: string) => {
     setSelected((prev) =>
@@ -55,8 +48,8 @@ export default function Survey4Screen() {
   };
 
   const handleContinue = () => {
-    setCareSetting(selected);
-    router.push("./survey-5" as any);
+    setInnovatorTechnologyCategories(selected);
+    router.push("./innovator-survey-4" as any);
   };
 
   return (
@@ -75,11 +68,10 @@ export default function Survey4Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          Where will this technology be used?
+          What category best describes your solution?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all that apply to help us find the best tech matches for your
-          environment.
+          Select all that apply.
         </ThemedText>
       </View>
 
@@ -88,53 +80,37 @@ export default function Survey4Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {SECTIONS.map((section) => (
-          <View key={section.title} style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionLine} />
-              <ThemedText style={styles.sectionTitle}>{section.title}</ThemedText>
-              <View style={styles.sectionLine} />
-            </View>
-            <View style={styles.sectionGrid}>
-              {section.options.map(({ label, icon }) => {
-                const isSelected = selected.includes(label);
-                return (
-                  <TouchableOpacity
-                    key={label}
-                    style={[
-                      styles.optionCard,
-                      isSelected && styles.optionCardSelected,
-                    ]}
-                    onPress={() => toggle(label)}
-                    activeOpacity={0.8}
-                  >
-                    {isSelected && (
-                      <View style={styles.checkBadge}>
-                        <MaterialIcons name="check" size={14} color="#FFFFFF" />
-                      </View>
-                    )}
-                    <View style={styles.cardIconWrap}>
-                      <MaterialIcons
-                        name={icon}
-                        size={28}
-                        color={isSelected ? "#FFFFFF" : TrustTeal}
-                      />
-                    </View>
-                    <ThemedText
-                      style={[
-                        styles.optionLabel,
-                        isSelected && styles.optionLabelSelected,
-                      ]}
-                      numberOfLines={2}
-                    >
-                      {label}
-                    </ThemedText>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        ))}
+        <View style={styles.cardGrid}>
+          {OPTIONS.map(({ label, description, icon }) => (
+            <TouchableOpacity
+              key={label}
+              style={[
+                styles.optionCard,
+                selected.includes(label) && styles.optionCardSelected,
+              ]}
+              onPress={() => toggle(label)}
+              activeOpacity={0.8}
+            >
+              {selected.includes(label) && (
+                <View style={styles.checkBadge}>
+                  <MaterialIcons name="check" size={14} color="#FFFFFF" />
+                </View>
+              )}
+              <MaterialCommunityIcons
+                name={icon}
+                size={32}
+                color={selected.includes(label) ? TrustTeal : ICON_TINT}
+                style={styles.optionIcon}
+              />
+              <ThemedText style={styles.optionLabel} numberOfLines={2}>
+                {label}
+              </ThemedText>
+              <ThemedText style={styles.optionDescription} numberOfLines={2}>
+                {description}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -179,58 +155,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 32,
   },
-  subtitle: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    lineHeight: 22,
-  },
+  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
-  section: {
-    marginBottom: 28,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-    gap: 12,
-  },
-  sectionLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: BORDER,
-    opacity: 0.6,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: TEXT_SECONDARY,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-  },
-  sectionGrid: {
+  cardGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
   optionCard: {
     width: "48%",
-    minHeight: 120,
+    aspectRatio: 1,
     backgroundColor: CARD_BG,
-    borderRadius: 20,
+    borderRadius: 24,
     borderWidth: 1.5,
     borderColor: CARD_BORDER,
     padding: 16,
-    marginBottom: 14,
+    marginBottom: 16,
     alignItems: "center",
     justifyContent: "flex-start",
     position: "relative",
   },
-  optionCardSelected: {
-    borderColor: TrustTeal,
-    borderWidth: 2,
-    backgroundColor: "rgba(0, 128, 128, 0.2)",
-  },
+  optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
   checkBadge: {
     position: "absolute",
     top: 12,
@@ -242,24 +188,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "rgba(0, 128, 128, 0.15)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 8,
-    marginBottom: 12,
-  },
+  optionIcon: { marginTop: 8, marginBottom: 10 },
   optionLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
     color: TEXT_PRIMARY,
     textAlign: "center",
+    marginBottom: 4,
   },
-  optionLabelSelected: {
-    color: "#FFFFFF",
+  optionDescription: {
+    fontSize: 11,
+    color: TEXT_SECONDARY,
+    textAlign: "center",
+    lineHeight: 14,
   },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {

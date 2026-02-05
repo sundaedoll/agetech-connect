@@ -1,4 +1,5 @@
 import { OnboardingSurveyProvider } from '@/contexts/onboarding-survey';
+import { ThemeProvider as ThemeProviderCustom } from '@/contexts/theme-context';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,7 +18,11 @@ if (Platform.OS === 'web') {
   }
 }
 
+import { useTheme } from '@/contexts/theme-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 // But we'll hide it manually after a timeout to prevent blocking
@@ -53,9 +58,51 @@ export const unstable_settings = {
   initialRouteName: '(auth)',
 };
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const colorScheme = useColorScheme();
+  const { setColorScheme } = useTheme();
+  const insets = useSafeAreaInsets();
 
+  const toggleTheme = () => {
+    setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
+  };
+
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <TouchableOpacity
+          onPress={toggleTheme}
+          style={{
+            position: 'absolute',
+            top: insets.top + 8,
+            right: 16,
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            backgroundColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          activeOpacity={0.7}>
+          <MaterialCommunityIcons
+            name={colorScheme === 'dark' ? 'white-balance-sunny' : 'weather-night'}
+            size={24}
+            color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'}
+          />
+        </TouchableOpacity>
+      </View>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
   // Handle splash screen and font loading with timeout protection
   useEffect(() => {
     const hideSplashScreen = async () => {
@@ -124,17 +171,11 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <OnboardingSurveyProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </OnboardingSurveyProvider>
+      <ThemeProviderCustom>
+        <OnboardingSurveyProvider>
+          <RootLayoutContent />
+        </OnboardingSurveyProvider>
+      </ThemeProviderCustom>
     </GestureHandlerRootView>
   );
 }

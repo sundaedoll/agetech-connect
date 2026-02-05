@@ -62,6 +62,18 @@ export default function TabLayout() {
           href: null, // Hide from tab bar
         }}
       />
+      <Tabs.Screen
+        name="match-success"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="chat-detail"
+        options={{
+          href: null, // Hide from tab bar - opened from messages list
+        }}
+      />
     </Tabs>
   );
 }

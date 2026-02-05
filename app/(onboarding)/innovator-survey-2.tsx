@@ -1,5 +1,5 @@
 /**
- * B. Engagement Intent - What are you open to doing with a technology provider? (Multi-select)
+ * Innovators & Companies: B. What They're Looking For - Multi-select
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
@@ -18,18 +18,19 @@ const TEXT_SECONDARY = "#9CA3AF";
 const CARD_BORDER = TrustTeal;
 
 const OPTIONS = [
-  "Participate in pilot programs",
-  "Provide user feedback / co-design",
-  "Purchase / procurement conversations",
-  "Exploration only (learning / discovery)",
+  "Pilot sites",
+  "Early adopters",
+  "User feedback / co-design partners",
+  "Sales opportunities",
+  "Research or validation partners",
 ];
 
 const TOTAL_STEPS = 5;
 const STEP = 2;
 
-export default function Survey2Screen() {
-  const { state, setEngagementIntent } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.engagementIntent);
+export default function InnovatorSurvey2Screen() {
+  const { state, setSeekingThroughPlatform } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string[]>(state.seekingThroughPlatform);
 
   const toggle = (item: string) => {
     setSelected((prev) =>
@@ -38,8 +39,8 @@ export default function Survey2Screen() {
   };
 
   const handleContinue = () => {
-    setEngagementIntent(selected);
-    router.push("./survey-3" as any);
+    setSeekingThroughPlatform(selected);
+    router.push("./innovator-survey-3" as any);
   };
 
   return (
@@ -58,10 +59,10 @@ export default function Survey2Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          What are you open to doing with a technology provider?
+          What are you primarily seeking through Agetech Connect?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all the ways you'd like to engage with innovators on our platform.
+          Select all that apply.
         </ThemedText>
       </View>
 
@@ -105,7 +106,7 @@ export default function Survey2Screen() {
           disabled={selected.length === 0}
           activeOpacity={0.8}
         >
-          <ThemedText style={styles.continueBtnText}>Continue</ThemedText>
+          <ThemedText style={styles.continueBtnText}>Next</ThemedText>
           <MaterialIcons name="arrow-forward" size={22} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
@@ -137,11 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 32,
   },
-  subtitle: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    lineHeight: 22,
-  },
+  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   optionCard: {

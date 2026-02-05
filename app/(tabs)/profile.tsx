@@ -1,10 +1,11 @@
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/theme';
+import { useTheme } from '@/contexts/theme-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface MenuItemProps {
@@ -48,6 +49,7 @@ function MenuItem({ title, subtitle, onPress, isDestructive = false }: MenuItemP
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const { colorScheme: themePreference, setColorScheme } = useTheme();
 
   const handleEditPreferences = () => {
     // Navigate to preferences screen
@@ -93,6 +95,26 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
+        {/* Theme toggle */}
+        <Card style={styles.menuCard}>
+          <View style={[styles.themeRow, { borderBottomColor: colors.border }]}>
+            <View style={styles.themeRowContent}>
+              <ThemedText style={[styles.menuItemTitle, { color: colors.text }]}>
+                Dark mode
+              </ThemedText>
+              <ThemedText style={[styles.menuItemSubtitle, { color: colors.textSecondary }]}>
+                {themePreference === null ? 'Using system' : themePreference === 'dark' ? 'On' : 'Off'}
+              </ThemedText>
+            </View>
+            <Switch
+              value={colorScheme === 'dark'}
+              onValueChange={(value) => setColorScheme(value ? 'dark' : 'light')}
+              trackColor={{ false: colors.border, true: colors.tint + '80' }}
+              thumbColor={colorScheme === 'dark' ? colors.tint : colors.textSecondary}
+            />
+          </View>
+        </Card>
+
         {/* Menu Items */}
         <Card style={styles.menuCard}>
           <MenuItem
@@ -126,7 +148,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 24,
-    paddingTop: 20,
+    paddingTop: 40,
   },
   header: {
     marginBottom: 24,
@@ -170,6 +192,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 0,
     overflow: 'hidden',
+  },
+  themeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderBottomWidth: 0,
+  },
+  themeRowContent: {
+    flex: 1,
   },
   menuItem: {
     flexDirection: 'row',

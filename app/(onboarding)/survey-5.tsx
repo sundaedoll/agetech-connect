@@ -17,14 +17,23 @@ const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
 
-const OPTIONS = ["Conservative", "Open", "Very open / early adopter"];
+const OPTIONS = ["Conservative", "Open", "Early Adopter"];
+const SEGMENT_BG = "#2a3235";
+const SEGMENT_SELECTED_BG = "#353B3C";
 
 const TOTAL_STEPS = 5;
 const STEP = 5;
 
+const LEGACY_MAP: Record<string, string> = {
+  "Very open / early adopter": "Early Adopter",
+};
+
 export default function Survey5Screen() {
   const { state, setRiskTolerance } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string | null>(state.riskTolerance);
+  const initial = state.riskTolerance
+    ? (LEGACY_MAP[state.riskTolerance] ?? state.riskTolerance)
+    : null;
+  const [selected, setSelected] = useState<string | null>(initial);
 
   const handleContinue = () => {
     if (selected) {
@@ -62,27 +71,26 @@ export default function Survey5Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {OPTIONS.map((label) => (
-          <TouchableOpacity
-            key={label}
-            style={[
-              styles.optionCard,
-              selected === label && styles.optionCardSelected,
-            ]}
-            onPress={() => setSelected(label)}
-            activeOpacity={0.8}
-          >
-            <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-            <View
-              style={[
-                styles.radioOuter,
-                selected === label && styles.radioOuterSelected,
-              ]}
-            >
-              {selected === label && <View style={styles.radioInner} />}
-            </View>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.segmentWrap}>
+          {OPTIONS.map((label) => {
+            const isSelected = selected === label;
+            return (
+              <TouchableOpacity
+                key={label}
+                style={[styles.segmentBtn, isSelected && styles.segmentBtnSelected]}
+                onPress={() => setSelected(label)}
+                activeOpacity={0.8}
+              >
+                <ThemedText
+                  style={[styles.segmentLabel, isSelected && styles.segmentLabelSelected]}
+                  numberOfLines={1}
+                >
+                  {label}
+                </ThemedText>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
         <View style={styles.infoCard}>
           <MaterialIcons
@@ -109,9 +117,14 @@ export default function Survey5Screen() {
           disabled={!selected}
           activeOpacity={0.8}
         >
-          <MaterialIcons name="check" size={22} color="#FFFFFF" />
           <ThemedText style={styles.continueBtnText}>Finish Setup</ThemedText>
+          <View style={styles.continueBtnBadge}>
+            <MaterialIcons name="check" size={18} color="#FFFFFF" />
+          </View>
         </TouchableOpacity>
+        <ThemedText style={styles.disclaimer}>
+          By finishing, you agree to our Terms of Service and Privacy Policy.
+        </ThemedText>
       </View>
     </SafeAreaView>
   );
@@ -119,7 +132,7 @@ export default function Survey5Screen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: BG },
-  header: { paddingHorizontal: 24, paddingTop: 8, paddingBottom: 20 },
+  header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -135,69 +148,64 @@ const styles = StyleSheet.create({
   progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
   progressDotDone: { backgroundColor: TrustTeal },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "700",
     color: TEXT_PRIMARY,
-    marginBottom: 6,
+    marginBottom: 12,
+    lineHeight: 32,
   },
-  subtitle: { fontSize: 14, color: TEXT_SECONDARY },
+  subtitle: {
+    fontSize: 16,
+    color: TEXT_SECONDARY,
+    lineHeight: 22,
+  },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
-  optionCard: {
+  segmentWrap: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: CARD_BG,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 18,
-    marginBottom: 12,
+    backgroundColor: SEGMENT_BG,
+    borderRadius: 999,
+    padding: 4,
+    marginBottom: 24,
   },
-  optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: TEXT_PRIMARY,
+  segmentBtn: {
     flex: 1,
-  },
-  radioOuter: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: BORDER,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
   },
-  radioOuterSelected: { borderColor: TrustTeal },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+  segmentBtnSelected: {
     backgroundColor: TrustTeal,
+  },
+  segmentLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: TEXT_SECONDARY,
+  },
+  segmentLabelSelected: {
+    color: "#FFFFFF",
   },
   infoCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: CARD_BG,
+    backgroundColor: SEGMENT_SELECTED_BG,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 16,
-    marginTop: 8,
+    padding: 20,
   },
-  infoCardIcon: { marginRight: 14 },
+  infoCardIcon: { marginRight: 16 },
   infoCardTextWrap: { flex: 1 },
   infoCardTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "700",
     color: TEXT_PRIMARY,
     marginBottom: 4,
   },
   infoCardSubtitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: TEXT_SECONDARY,
+    lineHeight: 20,
   },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
@@ -205,10 +213,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: TrustTeal,
-    borderRadius: 14,
+    borderRadius: 999,
     paddingVertical: 18,
-    gap: 10,
+    paddingHorizontal: 32,
+    gap: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
   },
   continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
+  continueBtnBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disclaimer: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    textAlign: "center",
+    lineHeight: 18,
+  },
 });

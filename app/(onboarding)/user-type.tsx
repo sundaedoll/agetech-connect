@@ -7,11 +7,11 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -66,11 +66,11 @@ export default function UserTypeScreen() {
   const handleContinue = () => {
     if (!selectedType) return;
     setUserType(selectedType);
-    // Families & Care Facilities go through the 5-step survey; Innovators skip to app
+    // Families & Care Facilities: same 5-step survey; Innovators: different 5-step survey
     if (selectedType === "caregiver" || selectedType === "facility") {
       router.push("./survey-1" as any);
     } else {
-      router.replace("../(tabs)" as any);
+      router.push("./innovator-survey-1" as any);
     }
   };
 
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingTop: 40,
     paddingBottom: 20,
     borderBottomWidth: 0,
   },

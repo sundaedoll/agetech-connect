@@ -15,6 +15,7 @@ const CARD_BG = "#364652";
 const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
+const CARD_BORDER = TrustTeal; // visible teal border on all cards (image 1 style)
 
 const OPTIONS: Array<{ label: string; description: string }> = [
   {
@@ -103,7 +104,7 @@ export default function Survey1Screen() {
               ]}
             >
               {selected.includes(label) && (
-                <MaterialIcons name="check" size={16} color="#FFFFFF" />
+                <MaterialIcons name="check" size={18} color="#FFFFFF" />
               )}
             </View>
           </TouchableOpacity>
@@ -120,7 +121,7 @@ export default function Survey1Screen() {
           disabled={selected.length === 0}
           activeOpacity={0.8}
         >
-          <ThemedText style={styles.continueBtnText}>Continue</ThemedText>
+          <ThemedText style={styles.continueBtnText}>Next</ThemedText>
           <MaterialIcons name="arrow-forward" size={22} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
@@ -130,7 +131,7 @@ export default function Survey1Screen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: BG },
-  header: { paddingHorizontal: 24, paddingTop: 8, paddingBottom: 20 },
+  header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -160,32 +161,34 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: CARD_BG,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 18,
-    marginBottom: 12,
+    borderWidth: 1.5,
+    borderColor: CARD_BORDER,
+    padding: 24,
+    marginBottom: 16,
+    minHeight: 100,
   },
   optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionTextWrap: { flex: 1, marginRight: 12 },
+  optionTextWrap: { flex: 1, marginRight: 16 },
   optionLabel: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
     color: TEXT_PRIMARY,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   optionDescription: {
-    fontSize: 13,
+    fontSize: 14,
     color: TEXT_SECONDARY,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   checkbox: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: BORDER,
+    borderColor: CARD_BORDER,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "transparent",
   },
   checkboxSelected: {
     backgroundColor: TrustTeal,
@@ -197,9 +200,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: TrustTeal,
-    borderRadius: 14,
+    borderRadius: 999,
     paddingVertical: 18,
+    paddingHorizontal: 32,
     gap: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
   },
   continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },

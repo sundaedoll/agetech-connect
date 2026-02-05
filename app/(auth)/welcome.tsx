@@ -1,10 +1,10 @@
 import { ThemedText } from '@/components/themed-text';
-import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/theme';
+import { Colors, TEXT_SECONDARY, TrustTeal } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WelcomeScreen() {
@@ -17,42 +17,62 @@ export default function WelcomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          {/* Logo/Icon area - placeholder for app logo */}
-          <View style={styles.logoContainer}>
-            <ThemedText type="title" style={styles.logoText}>
-              Agetech Connect
-            </ThemedText>
+          {/* Hero icon */}
+          <View style={styles.iconWrap}>
+            <MaterialCommunityIcons
+              name="hand-heart"
+              size={56}
+              color={TrustTeal}
+            />
           </View>
 
+          {/* Logo / brand */}
+          <ThemedText style={styles.logoText}>Agetech Connect</ThemedText>
+
           {/* Main heading */}
-          <ThemedText type="title" style={styles.heading}>
-            Welcome to Agetech Connect
+          <ThemedText style={styles.heading}>
+            Welcome
           </ThemedText>
 
           {/* Subtitle */}
-          <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <ThemedText style={styles.subtitle}>
             Connect with trusted partners in aging technology. Find the right match for your care needs.
           </ThemedText>
+
+          {/* Feature bullets */}
+          <View style={styles.features}>
+            <View style={styles.featureRow}>
+              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Match with caregivers & innovators</ThemedText>
+            </View>
+            <View style={styles.featureRow}>
+              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Personalized tech recommendations</ThemedText>
+            </View>
+            <View style={styles.featureRow}>
+              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Trusted, secure platform</ThemedText>
+            </View>
+          </View>
 
           {/* Spacer */}
           <View style={styles.spacer} />
 
           {/* CTA Buttons */}
           <View style={styles.buttonContainer}>
-            <Button
-              title="Sign Up"
+            <TouchableOpacity
+              style={styles.primaryButton}
               onPress={() => router.push('./signup' as any)}
-              variant="primary"
-              size="large"
-              style={styles.button}
-            />
-            <Button
-              title="Log In"
+              activeOpacity={0.8}>
+              <ThemedText style={styles.primaryButtonText}>Sign Up</ThemedText>
+              <MaterialCommunityIcons name="arrow-right" size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.outlineButton}
               onPress={() => router.push('./login' as any)}
-              variant="outline"
-              size="large"
-              style={styles.button}
-            />
+              activeOpacity={0.8}>
+              <ThemedText style={styles.outlineButtonText}>Log In</ThemedText>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -69,39 +89,97 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingHorizontal: 28,
+    paddingTop: 40,
+    paddingBottom: 48,
     justifyContent: 'center',
   },
-  logoContainer: {
+  iconWrap: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(0, 128, 128, 0.15)',
     alignItems: 'center',
-    marginBottom: 48,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 24,
   },
   logoText: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '700',
+    color: TrustTeal,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+    marginBottom: 12,
   },
   heading: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '700',
-    marginBottom: 16,
     textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 42,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 17,
     lineHeight: 26,
     textAlign: 'center',
     marginBottom: 32,
   },
+  features: {
+    marginBottom: 32,
+    gap: 14,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  featureIcon: {
+    marginRight: 12,
+  },
+  featureText: {
+    fontSize: 16,
+    color: TEXT_SECONDARY,
+    flex: 1,
+  },
   spacer: {
     flex: 1,
-    minHeight: 40,
+    minHeight: 32,
   },
   buttonContainer: {
-    gap: 16,
+    gap: 14,
   },
-  button: {
-    width: '100%',
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: TrustTeal,
+    borderRadius: 999,
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  primaryButtonText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  outlineButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderRadius: 999,
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    borderWidth: 2,
+  },
+  outlineButtonText: {
+    fontSize: 18,
+    fontWeight: '700',
   },
 });

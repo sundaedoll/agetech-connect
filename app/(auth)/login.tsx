@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors, TEXT_PRIMARY, TEXT_SECONDARY, TrustTeal } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
@@ -15,15 +16,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Auth screen colors - same as signup (Tech Blue / dark charcoal)
-const AUTH_BG = "#1a1f2e";
-const CARD_BG = "#252d3b";
-const BORDER = "#3d4f5f";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-const INPUT_BG = "#252d3b";
-
 export default function LoginScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +45,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -70,7 +65,7 @@ export default function LoginScreen() {
               <MaterialIcons
                 name="chevron-left"
                 size={28}
-                color={TEXT_PRIMARY}
+                color={colors.text}
               />
             </TouchableOpacity>
             <ThemedText type="title" style={styles.headerTitle}>
@@ -85,10 +80,10 @@ export default function LoginScreen() {
               <MaterialCommunityIcons
                 name="account-group"
                 size={48}
-                color={TEXT_PRIMARY}
+                color={colors.text}
               />
             </View>
-            <ThemedText type="title" style={styles.greetingTitle}>
+            <ThemedText type="title" style={[styles.greetingTitle, { color: colors.text }]}>
               Welcome Back
             </ThemedText>
             <ThemedText style={styles.greetingSubtitle}>
@@ -97,18 +92,18 @@ export default function LoginScreen() {
           </View>
 
           {/* Social login */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.cardBackground, borderColor: colors.border }]} activeOpacity={0.8}>
             <MaterialCommunityIcons
               name="google"
               size={22}
-              color={TEXT_PRIMARY}
+              color={colors.text}
             />
             <ThemedText style={styles.socialButtonText}>
               Continue with Google
             </ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.appleButton} activeOpacity={0.8}>
-            <MaterialCommunityIcons name="apple" size={22} color="#000000" />
+          <TouchableOpacity style={[styles.appleButton, { backgroundColor: colors.backgroundSecondary }]} activeOpacity={0.8}>
+            <MaterialCommunityIcons name="apple" size={22} color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} />
             <ThemedText style={styles.appleButtonText}>
               Continue with Apple
             </ThemedText>
@@ -116,25 +111,25 @@ export default function LoginScreen() {
 
           {/* Separator */}
           <View style={styles.separatorRow}>
-            <View style={styles.separatorLine} />
-            <ThemedText style={styles.separatorText}>
+            <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
+            <ThemedText style={[styles.separatorText, { color: colors.textSecondary }]}>
               OR LOG IN WITH EMAIL
             </ThemedText>
-            <View style={styles.separatorLine} />
+            <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
           </View>
 
           {/* Email field */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: errors.email ? colors.error : colors.border }]}>
             <MaterialIcons
               name="mail-outline"
               size={22}
-              color={TEXT_SECONDARY}
+              color={colors.textSecondary}
               style={styles.inputIcon}
             />
             <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
+              style={[styles.input, { color: colors.text }]}
               placeholder="Email Address"
-              placeholderTextColor={TEXT_SECONDARY}
+              placeholderTextColor={colors.textSecondary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -147,21 +142,22 @@ export default function LoginScreen() {
           ) : null}
 
           {/* Password field */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: errors.password ? colors.error : colors.border }]}>
             <MaterialIcons
               name="lock-outline"
               size={22}
-              color={TEXT_SECONDARY}
+              color={colors.textSecondary}
               style={styles.inputIcon}
             />
             <TextInput
               style={[
                 styles.input,
                 styles.inputRightPadding,
-                errors.password && styles.inputError,
+                { color: colors.text },
+                errors.password && { borderColor: colors.error },
               ]}
               placeholder="Password"
-              placeholderTextColor={TEXT_SECONDARY}
+              placeholderTextColor={colors.textSecondary}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -174,7 +170,7 @@ export default function LoginScreen() {
               <MaterialIcons
                 name={showPassword ? "visibility-off" : "visibility"}
                 size={22}
-                color={TEXT_SECONDARY}
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
@@ -205,7 +201,7 @@ export default function LoginScreen() {
 
           {/* Sign up prompt */}
           <View style={styles.footerPrompt}>
-            <ThemedText style={styles.footerText}>
+            <ThemedText style={[styles.footerText, { color: colors.textSecondary }]}>
               Don't have an account?{" "}
             </ThemedText>
             <TouchableOpacity onPress={() => router.push("./signup" as any)}>
@@ -221,7 +217,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AUTH_BG,
   },
   keyboardView: {
     flex: 1,
@@ -229,7 +224,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingTop: 40,
     paddingBottom: 32,
   },
   headerRow: {
@@ -247,7 +242,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: TEXT_PRIMARY,
   },
   greetingSection: {
     alignItems: "center",
@@ -280,10 +274,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: CARD_BG,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: BORDER,
     paddingVertical: 16,
     paddingHorizontal: 24,
     marginBottom: 12,
@@ -292,13 +284,11 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: TEXT_PRIMARY,
   },
   appleButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -319,21 +309,17 @@ const styles = StyleSheet.create({
   separatorLine: {
     flex: 1,
     height: 1,
-    backgroundColor: BORDER,
   },
   separatorText: {
     fontSize: 12,
     fontWeight: "600",
-    color: TEXT_SECONDARY,
     letterSpacing: 0.5,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: INPUT_BG,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: BORDER,
     marginBottom: 4,
     paddingLeft: 16,
   },
@@ -345,7 +331,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 0,
     fontSize: 16,
-    color: TEXT_PRIMARY,
     minHeight: 54,
   },
   inputRightPadding: {
@@ -394,7 +379,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 15,
-    color: TEXT_SECONDARY,
   },
   footerLink: {
     fontSize: 15,

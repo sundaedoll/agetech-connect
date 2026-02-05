@@ -15,19 +15,21 @@ const BG = "#1a1f2e";
 const CARD_BG = "#364652";
 const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
+const TEXT_SECONDARY = "#9CA3AF";
+const CARD_BORDER = TrustTeal;
 const ICON_TINT = "#5b9aa0";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
-const OPTIONS: Array<{ label: string; icon: IconName }> = [
-  { label: "Assistive technology", icon: "arm-flex" },
-  { label: "Long-term care solutions", icon: "home-heart" },
-  { label: "Retirement living solutions", icon: "home-city" },
-  { label: "Mobility & fall prevention", icon: "walk" },
-  { label: "Social connection & companionship", icon: "account-group" },
-  { label: "Cognitive / dementia support", icon: "head-heart" },
-  { label: "Remote monitoring & safety", icon: "shield-check" },
-  { label: "Finance / planning / care coordination", icon: "chart-box" },
+const OPTIONS: Array<{ label: string; description: string; icon: IconName }> = [
+  { label: "Assistive Tech", description: "Smart home tools & aids", icon: "arm-flex" },
+  { label: "Mobility", description: "Fall prevention & safety", icon: "walk" },
+  { label: "Dementia", description: "Memory & cognitive aids", icon: "head-heart" },
+  { label: "Monitoring", description: "Health & remote tracking", icon: "shield-check" },
+  { label: "Social Care", description: "Loneliness & connection", icon: "account-group" },
+  { label: "Medication", description: "Management & reminders", icon: "pill" },
+  { label: "Long-term care", description: "Care & living solutions", icon: "home-heart" },
+  { label: "Finance & planning", description: "Care coordination", icon: "chart-box" },
 ];
 
 const TOTAL_STEPS = 5;
@@ -78,28 +80,35 @@ export default function Survey3Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {OPTIONS.map(({ label, icon }) => (
-          <TouchableOpacity
-            key={label}
-            style={[
-              styles.optionCard,
-              selected.includes(label) && styles.optionCardSelected,
-            ]}
-            onPress={() => toggle(label)}
-            activeOpacity={0.8}
-          >
-            <MaterialCommunityIcons
-              name={icon}
-              size={24}
-              color={selected.includes(label) ? TrustTeal : ICON_TINT}
-              style={styles.optionIcon}
-            />
-            <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-            {selected.includes(label) && (
-              <MaterialIcons name="check-circle" size={24} color={TrustTeal} />
-            )}
-          </TouchableOpacity>
-        ))}
+        <View style={styles.cardGrid}>
+          {OPTIONS.map(({ label, description, icon }) => (
+            <TouchableOpacity
+              key={label}
+              style={[
+                styles.optionCard,
+                selected.includes(label) && styles.optionCardSelected,
+              ]}
+              onPress={() => toggle(label)}
+              activeOpacity={0.8}
+            >
+              {selected.includes(label) && (
+                <View style={styles.checkBadge}>
+                  <MaterialIcons name="check" size={14} color="#FFFFFF" />
+                </View>
+              )}
+              <MaterialCommunityIcons
+                name={icon}
+                size={32}
+                color={selected.includes(label) ? TrustTeal : ICON_TINT}
+                style={styles.optionIcon}
+              />
+              <ThemedText style={styles.optionLabel}>{label}</ThemedText>
+              <ThemedText style={styles.optionDescription} numberOfLines={2}>
+                {description}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -112,7 +121,7 @@ export default function Survey3Screen() {
           disabled={selected.length === 0}
           activeOpacity={0.8}
         >
-          <ThemedText style={styles.continueBtnText}>Continue</ThemedText>
+          <ThemedText style={styles.continueBtnText}>Next</ThemedText>
           <MaterialIcons name="arrow-forward" size={22} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
@@ -122,7 +131,7 @@ export default function Survey3Screen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: BG },
-  header: { paddingHorizontal: 24, paddingTop: 8, paddingBottom: 20 },
+  header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -138,44 +147,65 @@ const styles = StyleSheet.create({
   progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
   progressDotDone: { backgroundColor: TrustTeal },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "700",
     color: TEXT_PRIMARY,
-    marginBottom: 6,
+    marginBottom: 10,
+    lineHeight: 32,
   },
-  subtitle: { fontSize: 14, color: "#9CA3AF" },
+  subtitle: {
+    fontSize: 16,
+    color: TEXT_SECONDARY,
+    lineHeight: 22,
+  },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
-  optionCard: {
+  cardGrid: {
     flexDirection: "row",
-    alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  optionCard: {
+    width: "48%",
+    aspectRatio: 1,
     backgroundColor: CARD_BG,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 18,
-    marginBottom: 12,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: CARD_BORDER,
+    padding: 16,
+    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    position: "relative",
   },
   optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
-  optionIcon: { marginRight: 14 },
-  optionLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: TEXT_PRIMARY,
-    flex: 1,
-  },
-  checkbox: {
+  checkBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
     width: 24,
     height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: BORDER,
+    borderRadius: 12,
+    backgroundColor: TrustTeal,
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxSelected: {
-    backgroundColor: TrustTeal,
-    borderColor: TrustTeal,
+  optionIcon: {
+    marginTop: 8,
+    marginBottom: 10,
+  },
+  optionLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: TEXT_PRIMARY,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  optionDescription: {
+    fontSize: 12,
+    color: TEXT_SECONDARY,
+    textAlign: "center",
+    lineHeight: 16,
   },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
@@ -183,9 +213,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: TrustTeal,
-    borderRadius: 14,
+    borderRadius: 999,
     paddingVertical: 18,
+    paddingHorizontal: 32,
     gap: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
   },
   continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },

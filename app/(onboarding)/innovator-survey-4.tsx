@@ -1,6 +1,5 @@
 /**
- * D. Care Setting (Contextual Filter)
- * Where will this technology be used? (Multi-select)
+ * Innovators & Companies: D. Deployment Setting - Multi-select
  */
 import { ThemedText } from "@/components/themed-text";
 import { TrustTeal } from "@/constants/theme";
@@ -16,9 +15,9 @@ const CARD_BG = "#364652";
 const BORDER = "#3d4f5f";
 const TEXT_PRIMARY = "#FFFFFF";
 const TEXT_SECONDARY = "#9CA3AF";
+const CARD_BORDER = TrustTeal;
 
 type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
-const CARD_BORDER = TrustTeal;
 
 const SECTIONS: Array<{
   title: string;
@@ -36,7 +35,7 @@ const SECTIONS: Array<{
     options: [
       { label: "Assisted living", icon: "favorite" },
       { label: "Long-term care", icon: "local-hospital" },
-      { label: "Community / day programs", icon: "groups" },
+      { label: "Community / outpatient", icon: "groups" },
     ],
   },
 ];
@@ -44,9 +43,9 @@ const SECTIONS: Array<{
 const TOTAL_STEPS = 5;
 const STEP = 4;
 
-export default function Survey4Screen() {
-  const { state, setCareSetting } = useOnboardingSurvey();
-  const [selected, setSelected] = useState<string[]>(state.careSetting);
+export default function InnovatorSurvey4Screen() {
+  const { state, setDeploymentSetting } = useOnboardingSurvey();
+  const [selected, setSelected] = useState<string[]>(state.deploymentSetting);
 
   const toggle = (item: string) => {
     setSelected((prev) =>
@@ -55,8 +54,8 @@ export default function Survey4Screen() {
   };
 
   const handleContinue = () => {
-    setCareSetting(selected);
-    router.push("./survey-5" as any);
+    setDeploymentSetting(selected);
+    router.push("./innovator-survey-5" as any);
   };
 
   return (
@@ -75,11 +74,10 @@ export default function Survey4Screen() {
           ))}
         </View>
         <ThemedText style={styles.title}>
-          Where will this technology be used?
+          Where is your technology intended to be used?
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Select all that apply to help us find the best tech matches for your
-          environment.
+          Select all that apply.
         </ThemedText>
       </View>
 
@@ -179,16 +177,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 32,
   },
-  subtitle: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    lineHeight: 22,
-  },
+  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
-  section: {
-    marginBottom: 28,
-  },
+  section: { marginBottom: 28 },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -258,9 +250,7 @@ const styles = StyleSheet.create({
     color: TEXT_PRIMARY,
     textAlign: "center",
   },
-  optionLabelSelected: {
-    color: "#FFFFFF",
-  },
+  optionLabelSelected: { color: "#FFFFFF" },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
     flexDirection: "row",
