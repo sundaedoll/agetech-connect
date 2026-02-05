@@ -1,6 +1,7 @@
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { getShadowStyle } from '@/utils/shadow-styles';
 import React from 'react';
 import { TouchableOpacity, ViewStyle } from 'react-native';
 
@@ -24,11 +25,12 @@ export function Card({ children, style, onPress, elevated = true }: CardProps) {
   };
 
   if (elevated) {
-    cardStyle.shadowColor = colors.shadow;
-    cardStyle.shadowOffset = { width: 0, height: 2 };
-    cardStyle.shadowOpacity = 0.1;
-    cardStyle.shadowRadius = 8;
-    cardStyle.elevation = 3; // Android shadow
+    Object.assign(cardStyle, getShadowStyle({
+      color: colors.shadow,
+      offset: { width: 0, height: 2 },
+      opacity: 0.1,
+      radius: 8,
+    }));
   }
 
   if (onPress) {

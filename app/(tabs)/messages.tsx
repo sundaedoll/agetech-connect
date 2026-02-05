@@ -270,17 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     borderRadius: 18,
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 3,
-      },
-      default: {},
-    }),
+    ...(Platform.OS === 'android' ? { elevation: 3 } : {}),
   },
   chatCardContent: {
     flexDirection: 'row',
