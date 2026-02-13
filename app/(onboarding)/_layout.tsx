@@ -20,6 +20,9 @@ export default function OnboardingLayout() {
       <Stack.Screen name="innovator-survey-3" />
       <Stack.Screen name="innovator-survey-4" />
       <Stack.Screen name="innovator-survey-5" />
+      <Stack.Screen name="innovator-profile-1" />
+      <Stack.Screen name="innovator-profile-2" />
+      <Stack.Screen name="innovator-profile-3" />
     </Stack>
   );
 }

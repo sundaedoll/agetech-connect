@@ -2,6 +2,24 @@ import React, { createContext, useCallback, useContext, useState } from 'react';
 
 export type UserType = 'caregiver' | 'facility' | 'innovator' | null;
 
+export interface InnovatorProfile {
+  companyName: string;
+  tagline: string;
+  logoUri: string;
+  website: string;
+  contactEmail: string;
+  contactPhone: string;
+  productName: string;
+  description: string;
+  technologyStage: string;
+  benefits: string[];
+  categories: string[];
+  yearsInOperation: string;
+  certifications: string[];
+  pilotPartners: string;
+  testimonials: string;
+}
+
 export interface OnboardingSurveyState {
   userType: UserType;
   adoptionReadiness: string[];
@@ -15,7 +33,27 @@ export interface OnboardingSurveyState {
   innovatorTechnologyCategories: string[];
   deploymentSetting: string[];
   readinessForEngagement: string[];
+  // Innovator detailed profile (after survey)
+  innovatorProfile: InnovatorProfile | null;
 }
+
+const defaultInnovatorProfile: InnovatorProfile = {
+  companyName: "",
+  tagline: "",
+  logoUri: "",
+  website: "",
+  contactEmail: "",
+  contactPhone: "",
+  productName: "",
+  description: "",
+  technologyStage: "",
+  benefits: [],
+  categories: [],
+  yearsInOperation: "",
+  certifications: [],
+  pilotPartners: "",
+  testimonials: "",
+};
 
 const initialState: OnboardingSurveyState = {
   userType: null,
@@ -29,6 +67,7 @@ const initialState: OnboardingSurveyState = {
   innovatorTechnologyCategories: [],
   deploymentSetting: [],
   readinessForEngagement: [],
+  innovatorProfile: null,
 };
 
 type SurveyContextValue = {
@@ -44,6 +83,7 @@ type SurveyContextValue = {
   setInnovatorTechnologyCategories: (v: string[]) => void;
   setDeploymentSetting: (v: string[]) => void;
   setReadinessForEngagement: (v: string[]) => void;
+  setInnovatorProfile: (v: Partial<InnovatorProfile>) => void;
   reset: () => void;
 };
 
@@ -96,8 +136,18 @@ export function OnboardingSurveyProvider({ children }: { children: React.ReactNo
     setState((s) => ({ ...s, readinessForEngagement }));
   }, []);
 
+  const setInnovatorProfile = useCallback((updates: Partial<InnovatorProfile>) => {
+    setState((s) => ({
+      ...s,
+      innovatorProfile: {
+        ...(s.innovatorProfile ?? defaultInnovatorProfile),
+        ...updates,
+      },
+    }));
+  }, []);
+
   const reset = useCallback(() => {
-    setState(initialState);
+    setState({ ...initialState, innovatorProfile: null });
   }, []);
 
   return (
@@ -115,6 +165,7 @@ export function OnboardingSurveyProvider({ children }: { children: React.ReactNo
         setInnovatorTechnologyCategories,
         setDeploymentSetting,
         setReadinessForEngagement,
+        setInnovatorProfile,
         reset,
       }}>
       {children}

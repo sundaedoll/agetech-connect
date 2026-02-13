@@ -43,7 +43,7 @@ const TOTAL_STEPS = 5;
 const STEP = 5;
 
 export default function InnovatorSurvey5Screen() {
-  const { state, setReadinessForEngagement } = useOnboardingSurvey();
+  const { state, setReadinessForEngagement, setInnovatorProfile } = useOnboardingSurvey();
   const [selected, setSelected] = useState<string[]>(state.readinessForEngagement);
 
   const toggle = (item: string) => {
@@ -54,7 +54,8 @@ export default function InnovatorSurvey5Screen() {
 
   const handleContinue = () => {
     setReadinessForEngagement(selected);
-    router.replace("../(tabs)" as any);
+    setInnovatorProfile({ technologyStage: state.technologyStage ?? "" });
+    router.replace("./innovator-profile-1" as any);
   };
 
   return (
