@@ -72,12 +72,7 @@ export default function InnovatorProfile2Screen() {
     setBenefits((prev) => prev.filter((_, idx) => idx !== i));
   };
 
-  const canContinue =
-    productName.trim() &&
-    description.trim() &&
-    technologyStage &&
-    benefits.length >= 3 &&
-    categories.length >= 1;
+  const canContinue = true; // All fields optional for now
 
   const handleContinue = () => {
     setInnovatorProfile({
@@ -96,7 +91,7 @@ export default function InnovatorProfile2Screen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        <View style={[styles.header, { paddingTop: 80 }]}>
+        <View style={styles.header}>
           <View style={styles.stepIndicator}>
             {Array.from({ length: STEPS }).map((_, i) => (
               <View
@@ -109,17 +104,10 @@ export default function InnovatorProfile2Screen() {
               />
             ))}
           </View>
-          <View style={[styles.heroCard, { backgroundColor: colors.tint + "18", borderColor: colors.tint }]}>
-            <View style={[styles.heroIconWrap, { backgroundColor: colors.tint }]}>
-              <MaterialCommunityIcons name="lightbulb-on" size={36} color="#FFFFFF" />
-            </View>
-            <ThemedText type="title" style={[styles.title, { color: colors.text }]}>
-              Solution Overview
-            </ThemedText>
-            <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
-              Describe your product and its impact.
-            </ThemedText>
-          </View>
+          <ThemedText style={[styles.title, { color: colors.text }]}>Solution Overview</ThemedText>
+          <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Describe your product and its impact.
+          </ThemedText>
         </View>
 
         <ScrollView
@@ -187,7 +175,7 @@ export default function InnovatorProfile2Screen() {
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="format-list-checks" size={22} color={colors.tint} />
             <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-              Main benefits / impact (3–5) <ThemedText style={styles.required}>*</ThemedText>
+              Main benefits / impact (2–5) <ThemedText style={styles.required}>*</ThemedText>
             </ThemedText>
             <View style={[styles.benefitCount, { backgroundColor: colors.tint + "30" }]}>
               <ThemedText style={[styles.benefitCountText, { color: colors.tint }]}>{benefits.length}/5</ThemedText>
@@ -283,25 +271,11 @@ export default function InnovatorProfile2Screen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   keyboardView: { flex: 1 },
-  header: { paddingHorizontal: 24, paddingBottom: 24 },
-  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 24 },
+  header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 16 },
+  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 12 },
   stepDot: { width: 8, height: 8, borderRadius: 4 },
-  heroCard: {
-    alignItems: "center",
-    padding: 24,
-    borderRadius: 24,
-    borderWidth: 1,
-  },
-  heroIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 8, textAlign: "center" },
-  subtitle: { fontSize: 16, lineHeight: 24, textAlign: "center", marginBottom: 0 },
+  title: { fontSize: 20, fontWeight: "700", marginBottom: 4 },
+  subtitle: { fontSize: 14, lineHeight: 20, color: "#454545" },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 48 },
   productCard: {

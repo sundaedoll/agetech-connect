@@ -2,7 +2,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import React, { useCallback, useState } from 'react';
+import { Image } from 'expo-image';
+import React, { useCallback, useRef, useState } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -14,13 +15,21 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 48;
-const CARD_HEIGHT = Math.min(SCREEN_HEIGHT * 0.65, 600);
-const SWIPE_THRESHOLD = 80;
-const VELOCITY_THRESHOLD = 400;
+const CARD_WIDTH = SCREEN_WIDTH - 40;
+const IMAGE_HEIGHT = 200;
+const CARD_CONTENT_HEIGHT = 130;
+const CARD_HEIGHT = IMAGE_HEIGHT + CARD_CONTENT_HEIGHT;
+const SWIPE_THRESHOLD = 70;
+const VELOCITY_THRESHOLD = 350;
 
-const springConfig = { damping: 20, stiffness: 120 };
-const swipeOutConfig = { damping: 18, stiffness: 90 };
+const springConfig = { damping: 22, stiffness: 150 };
+const swipeOutConfig = { damping: 20, stiffness: 120 };
+
+const CARD_BG = '#FFF8DC';
+const CARD_BG_ALT = '#FFF4C2';
+
+// Use family.jpg as default - swap for download.jpg when available
+const DEFAULT_CARD_IMAGE = require('@/assets/images/selector_page/family.jpg');
 
 export type SwipeCardData = {
   id: string;
@@ -31,6 +40,7 @@ export type SwipeCardData = {
   description: string;
   matchReason: string;
   tags?: string[];
+  imageUri?: number;
 };
 
 interface SwipeCardsProps {
@@ -38,14 +48,15 @@ interface SwipeCardsProps {
   onSwipeLeft?: (card: SwipeCardData) => void;
   onSwipeRight?: (card: SwipeCardData) => void;
   topMatch?: boolean;
+  bottomPadding?: number;
 }
 
-export function SwipeCards({ cards, onSwipeLeft, onSwipeRight, topMatch = true }: SwipeCardsProps) {
+export function SwipeCards({ cards, onSwipeLeft, onSwipeRight, topMatch = true, bottomPadding: propBottomPadding }: SwipeCardsProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const insets = useSafeAreaInsets();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [cardStack, setCardStack] = useState(cards.slice(0, 3));
+  const currentIndexRef = useRef(0);
+  const [renderIndex, setRenderIndex] = useState(0);
   const [lastSwiped, setLastSwiped] = useState<{ card: SwipeCardData; direction: 'left' | 'right'; index: number } | null>(null);
 
   const translateX = useSharedValue(0);
@@ -53,39 +64,28 @@ export function SwipeCards({ cards, onSwipeLeft, onSwipeRight, topMatch = true }
   const rotate = useSharedValue(0);
   const opacity = useSharedValue(1);
 
-  const bottomPadding = Math.max(insets.bottom, 20);
-
-  const isDark = colorScheme === 'dark';
-  const cardBg = colors.cardBackground;
-  const cardBorder = colors.border;
-  const textPrimary = colors.text;
-  const textSecondary = colors.textSecondary;
-  const tagBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  const topMatchBg = isDark ? 'rgba(196, 181, 80, 0.3)' : 'rgba(196, 181, 80, 0.25)';
+  const bottomPadding = propBottomPadding ?? Math.max(insets.bottom, 16);
 
   const getStageLabel = (stage: 'pilot' | 'earlyCommercial' | 'mature') => {
     switch (stage) {
-      case 'pilot':
-        return 'Pilot Tech';
-      case 'earlyCommercial':
-        return 'Early Commercial';
-      case 'mature':
-        return 'Mature Tech';
+      case 'pilot': return 'Pilot Tech';
+      case 'earlyCommercial': return 'Early Commercial';
+      case 'mature': return 'Mature Tech';
     }
   };
 
   const handleSwipeComplete = useCallback(
     (direction: 'left' | 'right') => {
-      const currentCard = cards[currentIndex];
-      setLastSwiped({ card: currentCard, direction, index: currentIndex });
+      const idx = currentIndexRef.current;
+      const currentCard = cards[idx];
+      setLastSwiped({ card: currentCard, direction, index: idx });
 
       if (direction === 'left' && onSwipeLeft) onSwipeLeft(currentCard);
       else if (direction === 'right' && onSwipeRight) onSwipeRight(currentCard);
 
-      if (currentIndex < cards.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-        const nextIndex = currentIndex + 1;
-        setCardStack(cards.slice(nextIndex, nextIndex + 3));
+      if (idx < cards.length - 1) {
+        currentIndexRef.current = idx + 1;
+        setRenderIndex(idx + 1);
       }
 
       translateX.value = 0;
@@ -93,44 +93,38 @@ export function SwipeCards({ cards, onSwipeLeft, onSwipeRight, topMatch = true }
       rotate.value = 0;
       opacity.value = 1;
     },
-    [currentIndex, cards, onSwipeLeft, onSwipeRight, translateX, translateY, rotate, opacity]
+    [cards, onSwipeLeft, onSwipeRight, translateX, translateY, rotate, opacity]
   );
 
   const handleUndo = useCallback(() => {
-    if (!lastSwiped || currentIndex === 0) return;
-    setCurrentIndex(lastSwiped.index);
-    setCardStack(cards.slice(lastSwiped.index, lastSwiped.index + 3));
+    if (!lastSwiped || currentIndexRef.current === 0) return;
+    currentIndexRef.current = lastSwiped.index;
+    setRenderIndex(lastSwiped.index);
     setLastSwiped(null);
-  }, [lastSwiped, currentIndex, cards]);
+  }, [lastSwiped]);
 
   const panGesture = Gesture.Pan()
-    .minDistance(8)
+    .minDistance(6)
     .onUpdate((event) => {
       translateX.value = event.translationX;
-      translateY.value = event.translationY * 0.5;
-      rotate.value = (event.translationX / CARD_WIDTH) * 12;
+      translateY.value = event.translationY * 0.4;
+      rotate.value = (event.translationX / CARD_WIDTH) * 10;
     })
     .onEnd((event) => {
       const absX = Math.abs(event.translationX);
       const velocityX = event.velocityX;
-      const shouldSwipe =
-        absX > SWIPE_THRESHOLD || Math.abs(velocityX) > VELOCITY_THRESHOLD;
+      const shouldSwipe = absX > SWIPE_THRESHOLD || Math.abs(velocityX) > VELOCITY_THRESHOLD;
       const direction = event.translationX > 0 ? 'right' : 'left';
-      const velocityMatchesDirection =
-        (velocityX > 0 && direction === 'right') || (velocityX < 0 && direction === 'left');
+      const velocityMatches = (velocityX > 0 && direction === 'right') || (velocityX < 0 && direction === 'left');
 
-      if (shouldSwipe && (absX > 40 || velocityMatchesDirection)) {
-        const targetX = direction === 'right' ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100;
+      if (shouldSwipe && (absX > 35 || velocityMatches)) {
+        const targetX = direction === 'right' ? SCREEN_WIDTH + 120 : -SCREEN_WIDTH - 120;
         opacity.value = withSpring(0, springConfig);
-        translateX.value = withSpring(
-          targetX,
-          swipeOutConfig,
-          (finished) => {
-            if (finished) runOnJS(handleSwipeComplete)(direction);
-          }
-        );
+        translateX.value = withSpring(targetX, swipeOutConfig, (finished) => {
+          if (finished) runOnJS(handleSwipeComplete)(direction);
+        });
         translateY.value = withSpring(0, springConfig);
-        rotate.value = withSpring(direction === 'right' ? 15 : -15, springConfig);
+        rotate.value = withSpring(direction === 'right' ? 12 : -12, springConfig);
       } else {
         translateX.value = withSpring(0, springConfig);
         translateY.value = withSpring(0, springConfig);
@@ -138,133 +132,122 @@ export function SwipeCards({ cards, onSwipeLeft, onSwipeRight, topMatch = true }
       }
     });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { rotate: `${rotate.value}deg` },
-      ],
-      opacity: opacity.value,
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { rotate: `${rotate.value}deg` },
+    ],
+    opacity: opacity.value,
+  }));
 
-  if (cards.length === 0 || currentIndex >= cards.length) {
+  if (cards.length === 0 || renderIndex >= cards.length) {
     return (
       <View style={styles.emptyContainer}>
-        <ThemedText type="title" style={[styles.emptyText, { color: textSecondary }]}>
+        <ThemedText type="title" style={[styles.emptyText, { color: colors.textSecondary }]}>
           No more cards to swipe!
         </ThemedText>
-        <ThemedText style={[styles.emptySubtext, { color: textSecondary }]}>
+        <ThemedText style={[styles.emptySubtext, { color: colors.textSecondary }]}>
           Check back later for new matches
         </ThemedText>
       </View>
     );
   }
 
-  const currentCard = cards[currentIndex];
-  const tags = currentCard.tags ?? [getStageLabel(currentCard.stage), currentCard.category];
+  const displayCards = cards.slice(renderIndex, renderIndex + 3);
+  const currentCard = displayCards[0];
 
   const triggerSwipe = (direction: 'left' | 'right') => {
-    const targetX = direction === 'right' ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100;
+    const targetX = direction === 'right' ? SCREEN_WIDTH + 120 : -SCREEN_WIDTH - 120;
     opacity.value = withSpring(0, springConfig);
-    translateX.value = withSpring(
-      targetX,
-      swipeOutConfig,
-      (finished) => {
-        if (finished) runOnJS(handleSwipeComplete)(direction);
-      }
-    );
+    translateX.value = withSpring(targetX, swipeOutConfig, (finished) => {
+      if (finished) runOnJS(handleSwipeComplete)(direction);
+    });
     translateY.value = withSpring(0, springConfig);
-    rotate.value = withSpring(direction === 'right' ? 15 : -15, springConfig);
+    rotate.value = withSpring(direction === 'right' ? 12 : -12, springConfig);
   };
+
+  const cardBgColor = colorScheme === 'dark' ? colors.cardBackground : CARD_BG;
+
+  const renderCard = (card: SwipeCardData, isTop: boolean) => (
+    <View
+      key={card.id}
+      style={[
+        styles.card,
+        {
+          backgroundColor: cardBgColor,
+          borderColor: colors.border,
+          transform: isTop ? undefined : [{ scale: 0.95 }, { translateY: 12 }],
+          opacity: isTop ? 1 : 0.9,
+        },
+      ]}>
+      <View style={styles.cardImageWrap}>
+        <Image
+          source={card.imageUri ?? DEFAULT_CARD_IMAGE}
+          style={styles.cardImage}
+          contentFit="cover"
+        />
+        <View style={styles.cardImageOverlay}>
+          {isTop && topMatch && (
+            <View style={[styles.topMatchBadge, { backgroundColor: colors.selectedFill, borderColor: colors.selectedOutline }]}>
+              <MaterialCommunityIcons name="check" size={12} color="#000" />
+              <ThemedText style={styles.topMatchText}>TOP MATCH</ThemedText>
+            </View>
+          )}
+          <View style={[styles.stageBadge, { backgroundColor: colors.tint }]}>
+            <ThemedText style={styles.stageBadgeText}>{getStageLabel(card.stage)}</ThemedText>
+          </View>
+          <ThemedText style={styles.cardOverlayTitle}>{card.name}</ThemedText>
+          <ThemedText style={[styles.cardOverlayCompany, { color: colors.secondary }]}>by {card.company ?? 'Innovator'}</ThemedText>
+        </View>
+      </View>
+      <View style={[styles.cardContent, { backgroundColor: cardBgColor }]}>
+        <View style={styles.categoryPill}>
+          <ThemedText style={[styles.categoryPillText, { color: colors.tint }]}>{card.category}</ThemedText>
+        </View>
+        <ThemedText style={[styles.cardDescription, { color: colors.text }]} numberOfLines={2}>{card.description}</ThemedText>
+        <View style={styles.cardInfoRow}>
+          <MaterialCommunityIcons name="lightning-bolt" size={14} color={colors.tint} />
+          <ThemedText style={[styles.matchHint, { color: colors.textSecondary }]} numberOfLines={1}>{card.matchReason}</ThemedText>
+        </View>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* Background cards */}
-      {cardStack.slice(1).map((card, index) => (
-        <View
-          key={card.id}
-          style={[
-            styles.cardContainer,
-            { transform: [{ scale: 1 - (index + 1) * 0.05 }, { translateY: (index + 1) * 8 }], opacity: 0.6 - index * 0.2 },
-          ]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorder }]}>
-            <View style={[styles.cardImage, { backgroundColor: colors.tint + '35' }]} />
-            <View style={styles.cardContent}>
-              <ThemedText style={[styles.cardTitle, { color: textPrimary }]}>{card.name}</ThemedText>
-              <ThemedText style={[styles.cardCompany, { color: colors.tint }]}>by {card.company ?? 'Innovator'}</ThemedText>
-            </View>
+      <View style={styles.cardStack}>
+        {displayCards.slice(1).reverse().map((card, i) => (
+          <View key={card.id} style={[styles.cardContainer, { zIndex: 1 + i }]}>
+            {renderCard(card, false)}
           </View>
-        </View>
-      ))}
+        ))}
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[styles.cardContainer, styles.cardContainerTop, animatedStyle]}>
+            {renderCard(currentCard, true)}
+          </Animated.View>
+        </GestureDetector>
+      </View>
 
-      {/* Top card - swipeable */}
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.cardContainer, animatedStyle]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorder }]}>
-            {topMatch && (
-              <View style={[styles.topMatchBadge, { backgroundColor: topMatchBg }]}>
-                <MaterialCommunityIcons name="check" size={12} color={colors.text} />
-                <ThemedText style={[styles.topMatchText, { color: textPrimary }]}>TOP MATCH</ThemedText>
-              </View>
-            )}
-            <View style={[styles.cardImage, { backgroundColor: colors.tint + '35' }]} />
-            <View style={styles.cardContent}>
-              <ThemedText style={[styles.cardTitle, { color: textPrimary }]}>{currentCard.name}</ThemedText>
-              <ThemedText style={[styles.cardCompany, { color: colors.tint }]}>by {currentCard.company ?? 'CareTech Innovators'}</ThemedText>
-              <View style={styles.tagsRow}>
-                {tags.map((tag) => (
-                  <View
-                    key={tag}
-                    style={[
-                      styles.tag,
-                      { backgroundColor: tagBg },
-                      tag.toLowerCase().includes('looking') && { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.tint },
-                    ]}>
-                    <ThemedText style={[styles.tagText, { color: textPrimary }]}>{tag}</ThemedText>
-                  </View>
-                ))}
-              </View>
-              <View style={[styles.matchReasonBox, { borderTopColor: cardBorder }]}>
-                <MaterialCommunityIcons name="lightning-bolt" size={16} color={colors.tint} style={styles.matchIcon} />
-                <ThemedText style={[styles.matchReasonLabel, { color: textSecondary }]}>GOOD FIT BECAUSE...</ThemedText>
-                <ThemedText style={[styles.matchReasonText, { color: textPrimary }]}>{currentCard.matchReason}</ThemedText>
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-      </GestureDetector>
-
-      {/* Action buttons: X, undo, heart - subtle outline style */}
-      <View style={[styles.actionButtons, { paddingBottom: bottomPadding + 20 }]}>
+      <View style={[styles.actionButtons, { paddingBottom: bottomPadding + 16 }]}>
         <TouchableOpacity
-          style={[styles.actionButton, styles.actionButtonSubtle, { borderColor: colors.border }]}
+          style={[styles.actionButton, styles.actionButtonOutline, { borderColor: colors.border }]}
           onPress={() => triggerSwipe('left')}
           activeOpacity={0.7}>
-          <MaterialCommunityIcons name="close" size={26} color={colors.textSecondary} />
+          <MaterialCommunityIcons name="close" size={28} color={colors.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.actionButton, styles.actionButtonSubtle, { borderColor: colors.border }]}
+          style={[styles.actionButton, styles.actionButtonOutline, { borderColor: colors.border }]}
           onPress={handleUndo}
           disabled={!lastSwiped}
           activeOpacity={0.7}>
-          <MaterialCommunityIcons
-            name="undo-variant"
-            size={24}
-            color={lastSwiped ? colors.tint : colors.textSecondary}
-          />
+          <MaterialCommunityIcons name="undo-variant" size={26} color={lastSwiped ? colors.tint : colors.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.actionButtonSubtle,
-            styles.likeButtonSize,
-            { borderColor: colors.tint },
-          ]}
+          style={[styles.actionButton, styles.actionButtonPrimary, { backgroundColor: colors.selectedFill, borderColor: colors.selectedOutline }]}
           onPress={() => triggerSwipe('right')}
           activeOpacity={0.7}>
-          <MaterialCommunityIcons name="heart-outline" size={28} color={colors.tint} />
+          <MaterialCommunityIcons name="heart" size={28} color="#000" />
         </TouchableOpacity>
       </View>
     </View>
@@ -275,111 +258,141 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+  },
+  cardStack: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    minHeight: CARD_HEIGHT,
   },
   cardContainer: {
     position: 'absolute',
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardContainerTop: {
+    zIndex: 10,
   },
   card: {
     width: '100%',
     height: '100%',
-    borderRadius: 24,
+    borderRadius: 20,
     overflow: 'hidden',
-    position: 'relative',
     borderWidth: 1,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
   },
   topMatchBadge: {
     position: 'absolute',
-    top: 14,
-    left: 14,
+    top: 12,
+    left: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 999,
-    zIndex: 1,
+    borderWidth: 1,
+    zIndex: 2,
   },
-  topMatchText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
+  topMatchText: { fontSize: 11, fontWeight: '700', color: '#000' },
+  stageBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    zIndex: 2,
+  },
+  stageBadgeText: { fontSize: 10, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.5 },
+  cardImageWrap: {
+    height: IMAGE_HEIGHT,
+    position: 'relative',
+    backgroundColor: '#E8E0C8',
   },
   cardImage: {
-    height: 140,
-    margin: 16,
-    marginBottom: 0,
-    borderRadius: 16,
+    width: '100%',
+    height: '100%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  cardContent: {
-    flex: 1,
-    padding: 16,
-  },
-  cardTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  cardCompany: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  tagText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  matchReasonBox: {
-    paddingTop: 12,
-    borderTopWidth: 1,
-  },
-  matchIcon: { marginBottom: 6 },
-  matchReasonLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
-  matchReasonText: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  actionButtons: {
+  cardImageOverlay: {
     position: 'absolute',
     bottom: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  cardOverlayTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cardOverlayCompany: { fontSize: 14, fontWeight: '600' },
+  cardContent: {
+    padding: 16,
+    paddingTop: 12,
+    minHeight: CARD_CONTENT_HEIGHT,
+  },
+  categoryPill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(25,103,149,0.12)',
+    marginBottom: 10,
+  },
+  categoryPillText: { fontSize: 12, fontWeight: '700' },
+  cardDescription: { fontSize: 15, lineHeight: 22, marginBottom: 10 },
+  cardInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  matchHint: { fontSize: 13, flex: 1 },
+  actionButtons: {
+    width: '100%',
     flexDirection: 'row',
     gap: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 16,
   },
   actionButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionButtonSubtle: {
+  actionButtonOutline: {
     backgroundColor: 'transparent',
-    borderWidth: 1.5,
+    borderWidth: 2,
   },
-  likeButtonSize: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  actionButtonPrimary: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    borderWidth: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
   emptyContainer: {
     flex: 1,
@@ -387,14 +400,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-  emptyText: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
+  emptyText: { fontSize: 22, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
+  emptySubtext: { fontSize: 15, textAlign: 'center' },
 });

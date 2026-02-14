@@ -48,7 +48,7 @@ export default function InnovatorProfile3Screen() {
     );
   };
 
-  const canFinish = certifications.length >= 1;
+  const canFinish = true; // Optional for now
 
   const handleFinish = () => {
     setInnovatorProfile({
@@ -66,7 +66,7 @@ export default function InnovatorProfile3Screen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        <View style={[styles.header, { paddingTop: 80 }]}>
+        <View style={styles.header}>
           <View style={styles.stepIndicator}>
             {Array.from({ length: STEPS }).map((_, i) => (
               <View
@@ -79,16 +79,16 @@ export default function InnovatorProfile3Screen() {
               />
             ))}
           </View>
-          <View style={[styles.trustHero, { backgroundColor: colors.tint + "18", borderColor: colors.tint }]}>
-            <View style={[styles.trustIconWrap, { backgroundColor: colors.tint }]}>
-              <MaterialCommunityIcons name="shield-check" size={36} color="#FFFFFF" />
+          <View style={styles.titleRow}>
+            <View style={[styles.titleIconWrap, { backgroundColor: colors.tint + "20" }]}>
+              <MaterialCommunityIcons name="shield-check" size={24} color={colors.tint} />
             </View>
-            <ThemedText type="title" style={[styles.title, { color: colors.text }]}>
-              Credibility & Trust
-            </ThemedText>
-            <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
-              Help families trust your solution with certifications and proof.
-            </ThemedText>
+            <View>
+              <ThemedText style={[styles.title, { color: colors.text }]}>Credibility & Trust</ThemedText>
+              <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
+                Help families trust your solution
+              </ThemedText>
+            </View>
           </View>
         </View>
 
@@ -98,18 +98,17 @@ export default function InnovatorProfile3Screen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Certifications - mandatory */}
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="certificate-outline" size={24} color={colors.tint} />
-            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-              Certifications / compliance <ThemedText style={styles.required}>*</ThemedText>
+          {/* Certifications */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+            <View style={styles.sectionHeader}>
+              <MaterialCommunityIcons name="certificate-outline" size={22} color={colors.tint} />
+              <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Certifications / compliance</ThemedText>
+            </View>
+            <ThemedText style={[styles.sectionHint, { color: colors.textSecondary }]}>
+              Select all that apply
             </ThemedText>
-          </View>
-          <ThemedText style={[styles.sectionHint, { color: colors.textSecondary }]}>
-            Select all that apply (e.g. HIPAA, SOC2, PIPEDA, PIA)
-          </ThemedText>
-          <View style={styles.certWrap}>
-            {CERTIFICATIONS.map((c) => {
+            <View style={styles.certWrap}>
+              {CERTIFICATIONS.map((c) => {
               const sel = certifications.includes(c);
               return (
                 <TouchableOpacity
@@ -131,17 +130,14 @@ export default function InnovatorProfile3Screen() {
                 </TouchableOpacity>
               );
             })}
+            </View>
           </View>
 
           {/* Optional section */}
           <View style={[styles.optionalSection, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
             <View style={styles.optionalHeader}>
-              <View style={[styles.optionalPill, { backgroundColor: colors.backgroundSecondary }]}>
-                <MaterialCommunityIcons name="plus-circle-outline" size={16} color={colors.textSecondary} />
-                <ThemedText style={[styles.optionalLabel, { color: colors.textSecondary }]}>
-                  Optional but recommended
-                </ThemedText>
-              </View>
+              <MaterialCommunityIcons name="plus-circle-outline" size={18} color={colors.textSecondary} />
+              <ThemedText style={[styles.optionalLabel, { color: colors.textSecondary }]}>Optional</ThemedText>
             </View>
 
             <View style={styles.fieldGroup}>
@@ -209,39 +205,42 @@ export default function InnovatorProfile3Screen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   keyboardView: { flex: 1 },
-  header: { paddingHorizontal: 24, paddingBottom: 24 },
-  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 24 },
+  header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 16 },
+  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 12 },
   stepDot: { width: 8, height: 8, borderRadius: 4 },
-  trustHero: {
+  titleRow: {
+    flexDirection: "row",
     alignItems: "center",
-    padding: 24,
-    borderRadius: 24,
-    borderWidth: 1,
+    gap: 14,
   },
-  trustIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
+  titleIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
   },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 8, textAlign: "center" },
-  subtitle: { fontSize: 16, lineHeight: 24, textAlign: "center", marginBottom: 8 },
+  title: { fontSize: 20, fontWeight: "700", marginBottom: 2 },
+  subtitle: { fontSize: 14, lineHeight: 20 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 48 },
-  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 10 },
+  sectionCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 18,
+    marginBottom: 16,
+  },
+  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 },
   sectionTitle: { fontSize: 17, fontWeight: "700", flex: 1 },
-  sectionHint: { fontSize: 14, lineHeight: 20, marginBottom: 20 },
-  required: { color: "#EF4444" },
-  certWrap: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginBottom: 32 },
+  sectionHint: { fontSize: 13, lineHeight: 18, marginBottom: 14 },
+  certWrap: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   certChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    borderRadius: 16,
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
     borderWidth: 1,
   },
   checkbox: {
@@ -254,40 +253,36 @@ const styles = StyleSheet.create({
   },
   certChipText: { fontSize: 16, fontWeight: "600" },
   optionalSection: {
-    borderRadius: 24,
-    borderWidth: 1,
-    padding: 24,
-    marginBottom: 32,
-  },
-  optionalHeader: { marginBottom: 20 },
-  optionalPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  optionalLabel: { fontSize: 14, fontWeight: "600", letterSpacing: 0.3 },
-  fieldGroup: { marginBottom: 20 },
-  label: { fontSize: 15, fontWeight: "600", marginBottom: 10 },
-  input: {
     borderRadius: 16,
     borderWidth: 1,
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    padding: 18,
+    marginBottom: 24,
+  },
+  optionalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  optionalLabel: { fontSize: 14, fontWeight: "600" },
+  fieldGroup: { marginBottom: 16 },
+  label: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
+  input: {
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
   },
-  textArea: { minHeight: 90, textAlignVertical: "top" },
+  textArea: { minHeight: 80, textAlignVertical: "top" },
   primaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 20,
-    borderRadius: 18,
-    gap: 12,
-    marginBottom: 20,
+    paddingVertical: 18,
+    borderRadius: 14,
+    gap: 10,
+    marginBottom: 16,
   },
   primaryBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
   footerText: { fontSize: 13, textAlign: "center", lineHeight: 20 },
