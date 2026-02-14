@@ -3,23 +3,16 @@
  * How comfortable are you trying new technologies? (3-option select)
  */
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const BG = "#1a1f2e";
-const CARD_BG = "#364652";
-const BORDER = "#3d4f5f";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-
 const OPTIONS = ["Conservative", "Open", "Early Adopter"];
-const SEGMENT_BG = "#2a3235";
-const SEGMENT_SELECTED_BG = "#353B3C";
 
 const TOTAL_STEPS = 5;
 const STEP = 5;
@@ -29,6 +22,8 @@ const LEGACY_MAP: Record<string, string> = {
 };
 
 export default function Survey5Screen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const { state, setRiskTolerance } = useOnboardingSurvey();
   const initial = state.riskTolerance
     ? (LEGACY_MAP[state.riskTolerance] ?? state.riskTolerance)
@@ -43,7 +38,7 @@ export default function Survey5Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <View style={styles.progressRow}>
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -51,16 +46,16 @@ export default function Survey5Screen() {
               key={i}
               style={[
                 styles.progressDot,
+                { backgroundColor: i < STEP || i + 1 === STEP ? colors.accent : colors.border },
                 i + 1 === STEP && styles.progressDotActive,
-                i < STEP && styles.progressDotDone,
               ]}
             />
           ))}
         </View>
-        <ThemedText style={styles.title}>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
           How comfortable are you trying new technologies?
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
           This helps us match you with innovators whose products fit your
           preferred pace of adoption and risk profile.
         </ThemedText>
@@ -71,18 +66,24 @@ export default function Survey5Screen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.segmentWrap}>
+        <View style={[styles.segmentWrap, { backgroundColor: colors.backgroundSecondary }]}>
           {OPTIONS.map((label) => {
             const isSelected = selected === label;
             return (
               <TouchableOpacity
                 key={label}
-                style={[styles.segmentBtn, isSelected && styles.segmentBtnSelected]}
+                style={[
+                  styles.segmentBtn,
+                  isSelected && { backgroundColor: colors.selectedFill },
+                ]}
                 onPress={() => setSelected(label)}
                 activeOpacity={0.8}
               >
                 <ThemedText
-                  style={[styles.segmentLabel, isSelected && styles.segmentLabelSelected]}
+                  style={[
+                    styles.segmentLabel,
+                    { color: isSelected ? "#FFFFFF" : colors.textSecondary },
+                  ]}
                   numberOfLines={1}
                 >
                   {label}
@@ -92,18 +93,18 @@ export default function Survey5Screen() {
           })}
         </View>
 
-        <View style={styles.infoCard}>
+        <View style={[styles.infoCard, { backgroundColor: colors.cardBackground }]}>
           <MaterialIcons
             name="rocket-launch"
             size={28}
-            color={TrustTeal}
+            color={colors.secondary}
             style={styles.infoCardIcon}
           />
           <View style={styles.infoCardTextWrap}>
-            <ThemedText style={styles.infoCardTitle}>
+            <ThemedText style={[styles.infoCardTitle, { color: colors.text }]}>
               Innovation Matcher
             </ThemedText>
-            <ThemedText style={styles.infoCardSubtitle}>
+            <ThemedText style={[styles.infoCardSubtitle, { color: colors.textSecondary }]}>
               We'll show you tech that fits this profile.
             </ThemedText>
           </View>
@@ -112,7 +113,10 @@ export default function Survey5Screen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.continueBtn, !selected && styles.continueBtnDisabled]}
+          style={[
+            styles.continueBtn,
+            { backgroundColor: selected ? colors.tint : colors.border },
+          ]}
           onPress={handleContinue}
           disabled={!selected}
           activeOpacity={0.8}
@@ -122,7 +126,7 @@ export default function Survey5Screen() {
             <MaterialIcons name="check" size={18} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
-        <ThemedText style={styles.disclaimer}>
+        <ThemedText style={[styles.disclaimer, { color: colors.textSecondary }]}>
           By finishing, you agree to our Terms of Service and Privacy Policy.
         </ThemedText>
       </View>
@@ -131,7 +135,7 @@ export default function Survey5Screen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG },
+  container: { flex: 1 },
   header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
@@ -139,31 +143,14 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 20,
   },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: BORDER,
-  },
-  progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
-  progressDotDone: { backgroundColor: TrustTeal },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 12,
-    lineHeight: 32,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    lineHeight: 22,
-  },
+  progressDot: { width: 8, height: 8, borderRadius: 4 },
+  progressDotActive: { width: 24, borderRadius: 4 },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 12, lineHeight: 32 },
+  subtitle: { fontSize: 16, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   segmentWrap: {
     flexDirection: "row",
-    backgroundColor: SEGMENT_BG,
     borderRadius: 999,
     padding: 4,
     marginBottom: 24,
@@ -176,43 +163,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  segmentBtnSelected: {
-    backgroundColor: TrustTeal,
-  },
-  segmentLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: TEXT_SECONDARY,
-  },
-  segmentLabelSelected: {
-    color: "#FFFFFF",
-  },
+  segmentLabel: { fontSize: 15, fontWeight: "600" },
   infoCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: SEGMENT_SELECTED_BG,
     borderRadius: 16,
     padding: 20,
   },
   infoCardIcon: { marginRight: 16 },
   infoCardTextWrap: { flex: 1 },
-  infoCardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 4,
-  },
-  infoCardSubtitle: {
-    fontSize: 14,
-    color: TEXT_SECONDARY,
-    lineHeight: 20,
-  },
+  infoCardTitle: { fontSize: 17, fontWeight: "700", marginBottom: 4 },
+  infoCardSubtitle: { fontSize: 14, lineHeight: 20 },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: TrustTeal,
     borderRadius: 999,
     paddingVertical: 18,
     paddingHorizontal: 32,
@@ -224,7 +190,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
   continueBtnBadge: {
     width: 28,
@@ -234,10 +199,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  disclaimer: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    textAlign: "center",
-    lineHeight: 18,
-  },
+  disclaimer: { fontSize: 13, textAlign: "center", lineHeight: 18 },
 });

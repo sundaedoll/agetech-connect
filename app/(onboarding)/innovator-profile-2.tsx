@@ -109,12 +109,17 @@ export default function InnovatorProfile2Screen() {
               />
             ))}
           </View>
-          <ThemedText type="title" style={[styles.title, { color: colors.text }]}>
-            Solution Overview
-          </ThemedText>
-          <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Describe your product and its impact.
-          </ThemedText>
+          <View style={[styles.heroCard, { backgroundColor: colors.tint + "18", borderColor: colors.tint }]}>
+            <View style={[styles.heroIconWrap, { backgroundColor: colors.tint }]}>
+              <MaterialCommunityIcons name="lightbulb-on" size={36} color="#FFFFFF" />
+            </View>
+            <ThemedText type="title" style={[styles.title, { color: colors.text }]}>
+              Solution Overview
+            </ThemedText>
+            <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
+              Describe your product and its impact.
+            </ThemedText>
+          </View>
         </View>
 
         <ScrollView
@@ -123,10 +128,13 @@ export default function InnovatorProfile2Screen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Product card visual */}
+          {/* Product card with accent strip */}
           <View style={[styles.productCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
-            <View style={styles.productHeader}>
-              <MaterialCommunityIcons name="lightbulb-on" size={28} color={colors.tint} />
+            <View style={[styles.productAccent, { backgroundColor: colors.tint }]} />
+            <View style={styles.productCardInner}>
+              <View style={[styles.productIconWrap, { backgroundColor: colors.tint + "20" }]}>
+                <MaterialCommunityIcons name="lightbulb-on" size={32} color={colors.tint} />
+              </View>
               <TextInput
                 style={[styles.productNameInput, { color: colors.text }]}
                 placeholder="Product / solution name *"
@@ -134,22 +142,25 @@ export default function InnovatorProfile2Screen() {
                 value={productName}
                 onChangeText={setProductName}
               />
+              <TextInput
+                style={[styles.descriptionInput, { color: colors.text, backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}
+                placeholder="Plain-language description of what it does and who it helps *"
+                placeholderTextColor={colors.textSecondary}
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                numberOfLines={4}
+              />
             </View>
-            <TextInput
-              style={[styles.descriptionInput, { color: colors.text, borderColor: colors.border }]}
-              placeholder="Plain-language description of what it does and who it helps *"
-              placeholderTextColor={colors.textSecondary}
-              value={description}
-              onChangeText={setDescription}
-              multiline
-              numberOfLines={4}
-            />
           </View>
 
           {/* Stage selector */}
-          <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-            Technology stage <ThemedText style={styles.required}>*</ThemedText>
-          </ThemedText>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons name="rocket-launch-outline" size={22} color={colors.tint} />
+            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+              Technology stage <ThemedText style={styles.required}>*</ThemedText>
+            </ThemedText>
+          </View>
           <View style={styles.stageRow}>
             {STAGES.map((s) => {
               const sel = technologyStage === s;
@@ -158,13 +169,13 @@ export default function InnovatorProfile2Screen() {
                   key={s}
                   style={[
                     styles.stageChip,
-                    { borderColor: colors.border },
-                    sel && { backgroundColor: colors.tint + "25", borderColor: colors.tint },
+                    { borderColor: colors.border, backgroundColor: colors.cardBackground },
+                    sel && { backgroundColor: colors.tint, borderColor: colors.tint },
                   ]}
                   onPress={() => setTechnologyStage(s)}
                   activeOpacity={0.8}
                 >
-                  <ThemedText style={[styles.stageChipText, { color: sel ? colors.tint : colors.textSecondary }]}>
+                  <ThemedText style={[styles.stageChipText, { color: sel ? "#FFFFFF" : colors.textSecondary }]}>
                     {s}
                   </ThemedText>
                 </TouchableOpacity>
@@ -173,17 +184,25 @@ export default function InnovatorProfile2Screen() {
           </View>
 
           {/* Benefits (3–5 bullets) */}
-          <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-            Main benefits / impact (3–5) <ThemedText style={styles.required}>*</ThemedText>
-          </ThemedText>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons name="format-list-checks" size={22} color={colors.tint} />
+            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+              Main benefits / impact (3–5) <ThemedText style={styles.required}>*</ThemedText>
+            </ThemedText>
+            <View style={[styles.benefitCount, { backgroundColor: colors.tint + "30" }]}>
+              <ThemedText style={[styles.benefitCountText, { color: colors.tint }]}>{benefits.length}/5</ThemedText>
+            </View>
+          </View>
           {benefits.map((b, i) => (
-            <View key={i} style={[styles.benefitRow, { backgroundColor: colors.backgroundSecondary }]}>
-              <MaterialCommunityIcons name="check-circle" size={20} color={colors.tint} />
-              <ThemedText style={[styles.benefitText, { color: colors.text }]} numberOfLines={1}>
+            <View key={i} style={[styles.benefitRow, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+              <View style={[styles.benefitNum, { backgroundColor: colors.tint }]}>
+                <ThemedText style={styles.benefitNumText}>{i + 1}</ThemedText>
+              </View>
+              <ThemedText style={[styles.benefitText, { color: colors.text }]} numberOfLines={2}>
                 {b}
               </ThemedText>
-              <TouchableOpacity onPress={() => removeBenefit(i)} hitSlop={12}>
-                <MaterialIcons name="close" size={22} color={colors.textSecondary} />
+              <TouchableOpacity onPress={() => removeBenefit(i)} style={styles.removeBtn} hitSlop={12}>
+                <MaterialIcons name="close" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           ))}
@@ -206,19 +225,23 @@ export default function InnovatorProfile2Screen() {
                 returnKeyType="done"
               />
               <TouchableOpacity
-                style={[styles.addBtn, { backgroundColor: colors.tint }]}
+                style={[styles.addBtn, { backgroundColor: benefitInput.trim() ? colors.tint : colors.border }]}
                 onPress={addBenefit}
                 disabled={!benefitInput.trim()}
+                activeOpacity={0.8}
               >
-                <MaterialIcons name="add" size={24} color="#FFFFFF" />
+                <MaterialIcons name="add" size={26} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
           )}
 
           {/* Categories chips */}
-          <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-            Categories (select all that apply) <ThemedText style={styles.required}>*</ThemedText>
-          </ThemedText>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons name="tag-multiple-outline" size={22} color={colors.tint} />
+            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+              Categories (select all that apply) <ThemedText style={styles.required}>*</ThemedText>
+            </ThemedText>
+          </View>
           <View style={styles.chipWrap}>
             {CATEGORIES.map((c) => {
               const sel = categories.includes(c);
@@ -227,12 +250,13 @@ export default function InnovatorProfile2Screen() {
                   key={c}
                   style={[
                     styles.categoryChip,
-                    { borderColor: colors.border },
-                    sel && { backgroundColor: colors.tint + "25", borderColor: colors.tint },
+                    { borderColor: colors.border, backgroundColor: colors.cardBackground },
+                    sel && { backgroundColor: colors.tint + "30", borderColor: colors.tint },
                   ]}
                   onPress={() => toggleCategory(c)}
                   activeOpacity={0.8}
                 >
+                  {sel && <MaterialCommunityIcons name="check" size={16} color={colors.tint} style={styles.chipCheck} />}
                   <ThemedText style={[styles.categoryChipText, { color: sel ? colors.tint : colors.textSecondary }]}>
                     {c}
                   </ThemedText>
@@ -248,7 +272,7 @@ export default function InnovatorProfile2Screen() {
             activeOpacity={0.8}
           >
             <ThemedText style={styles.primaryBtnText}>Continue</ThemedText>
-            <MaterialCommunityIcons name="arrow-right" size={22} color="#FFFFFF" />
+            <MaterialCommunityIcons name="arrow-right-circle" size={26} color="#FFFFFF" />
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -260,72 +284,111 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   keyboardView: { flex: 1 },
   header: { paddingHorizontal: 24, paddingBottom: 24 },
-  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 20 },
+  stepIndicator: { flexDirection: "row", gap: 8, marginBottom: 24 },
   stepDot: { width: 8, height: 8, borderRadius: 4 },
-  title: { fontSize: 26, fontWeight: "700", marginBottom: 8 },
-  subtitle: { fontSize: 16, lineHeight: 22, marginBottom: 24 },
-  scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
-  productCard: {
-    borderRadius: 20,
+  heroCard: {
+    alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     borderWidth: 1,
-    padding: 20,
-    marginBottom: 24,
   },
-  productHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 },
-  productNameInput: { flex: 1, fontSize: 18, fontWeight: "700" },
+  heroIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  title: { fontSize: 24, fontWeight: "700", marginBottom: 8, textAlign: "center" },
+  subtitle: { fontSize: 16, lineHeight: 24, textAlign: "center", marginBottom: 0 },
+  scroll: { flex: 1 },
+  scrollContent: { paddingHorizontal: 24, paddingBottom: 48 },
+  productCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    overflow: "hidden",
+    marginBottom: 32,
+  },
+  productAccent: { height: 5, width: "100%" },
+  productCardInner: { padding: 22 },
+  productIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  productNameInput: { fontSize: 20, fontWeight: "700", marginBottom: 14, padding: 0 },
   descriptionInput: {
     borderWidth: 1,
-    borderRadius: 14,
-    padding: 14,
-    fontSize: 15,
-    minHeight: 100,
+    borderRadius: 16,
+    padding: 16,
+    fontSize: 16,
+    minHeight: 110,
     textAlignVertical: "top",
   },
-  sectionTitle: { fontSize: 15, fontWeight: "600", marginBottom: 12 },
+  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
+  sectionTitle: { fontSize: 17, fontWeight: "700", flex: 1 },
   required: { color: "#EF4444" },
-  stageRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 24 },
+  benefitCount: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  benefitCountText: { fontSize: 13, fontWeight: "700" },
+  stageRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginBottom: 28 },
   stageChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 16,
     borderWidth: 1,
   },
-  stageChipText: { fontSize: 14, fontWeight: "600" },
+  stageChipText: { fontSize: 14, fontWeight: "700" },
   benefitRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 8,
+    gap: 14,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 10,
   },
-  benefitText: { flex: 1, fontSize: 15 },
-  benefitAddRow: { flexDirection: "row", gap: 10, marginBottom: 24 },
+  benefitNum: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  benefitNumText: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
+  benefitText: { flex: 1, fontSize: 16, lineHeight: 22 },
+  removeBtn: { padding: 4 },
+  benefitAddRow: { flexDirection: "row", gap: 12, marginBottom: 28 },
   benefitInput: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    fontSize: 16,
   },
-  addBtn: { width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 28 },
+  addBtn: { width: 52, height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginBottom: 32 },
   categoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 16,
     borderWidth: 1,
   },
-  categoryChipText: { fontSize: 14, fontWeight: "600" },
+  chipCheck: { marginRight: 6 },
+  categoryChipText: { fontSize: 15, fontWeight: "600" },
   primaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 18,
-    borderRadius: 14,
-    gap: 10,
+    paddingVertical: 20,
+    borderRadius: 18,
+    gap: 12,
   },
   primaryBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
 });

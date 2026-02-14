@@ -2,22 +2,15 @@
  * Innovators & Companies: E. Readiness for Engagement - Multi-select + Finish
  */
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const BG = "#1a1f2e";
-const CARD_BG = "#364652";
-const BORDER = "#3d4f5f";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-const CARD_BORDER = TrustTeal;
-const CARD_SELECTED_BG = "rgba(0, 128, 128, 0.15)";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
@@ -43,6 +36,8 @@ const TOTAL_STEPS = 5;
 const STEP = 5;
 
 export default function InnovatorSurvey5Screen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const { state, setReadinessForEngagement, setInnovatorProfile } = useOnboardingSurvey();
   const [selected, setSelected] = useState<string[]>(state.readinessForEngagement);
 
@@ -59,7 +54,7 @@ export default function InnovatorSurvey5Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <View style={styles.progressRow}>
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -67,16 +62,16 @@ export default function InnovatorSurvey5Screen() {
               key={i}
               style={[
                 styles.progressDot,
+                { backgroundColor: i < STEP || i + 1 === STEP ? colors.accent : colors.border },
                 i + 1 === STEP && styles.progressDotActive,
-                i < STEP && styles.progressDotDone,
               ]}
             />
           ))}
         </View>
-        <ThemedText style={styles.title}>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
           Who are you best suited to work with right now?
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Select all that apply to your current solution readiness.
         </ThemedText>
       </View>
@@ -93,32 +88,34 @@ export default function InnovatorSurvey5Screen() {
               key={label}
               style={[
                 styles.optionCard,
-                isSelected && styles.optionCardSelected,
+                { backgroundColor: colors.cardBackground, borderColor: colors.border },
+                isSelected && { borderColor: colors.tint, borderWidth: 2, backgroundColor: colors.tint + "25" },
               ]}
               onPress={() => toggle(label)}
               activeOpacity={0.8}
             >
-              <View style={styles.cardIconWrap}>
+              <View style={[styles.cardIconWrap, { backgroundColor: colors.secondary + "20" }]}>
                 <MaterialCommunityIcons
                   name={icon}
                   size={32}
-                  color={isSelected ? TrustTeal : TEXT_SECONDARY}
+                  color={isSelected ? colors.tint : colors.textSecondary}
                 />
               </View>
               <View style={styles.cardTextWrap}>
-                <ThemedText style={styles.optionLabel}>{label}</ThemedText>
-                <ThemedText style={styles.optionDescription} numberOfLines={2}>
+                <ThemedText style={[styles.optionLabel, { color: colors.text }]}>{label}</ThemedText>
+                <ThemedText style={[styles.optionDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                   {description}
                 </ThemedText>
               </View>
               <View
                 style={[
                   styles.radioCircle,
-                  isSelected && styles.radioCircleSelected,
+                  { borderColor: colors.border },
+                  isSelected && { backgroundColor: colors.selectedFill, borderColor: colors.selectedOutline },
                 ]}
               >
                 {isSelected && (
-                  <MaterialIcons name="check" size={18} color="#FFFFFF" />
+                  <MaterialIcons name="check" size={18} color={colors.tint} />
                 )}
               </View>
             </TouchableOpacity>
@@ -130,7 +127,7 @@ export default function InnovatorSurvey5Screen() {
         <TouchableOpacity
           style={[
             styles.continueBtn,
-            selected.length === 0 && styles.continueBtnDisabled,
+            { backgroundColor: selected.length > 0 ? colors.tint : colors.border },
           ]}
           onPress={handleContinue}
           disabled={selected.length === 0}
@@ -138,7 +135,7 @@ export default function InnovatorSurvey5Screen() {
         >
           <ThemedText style={styles.continueBtnText}>Start Matching</ThemedText>
         </TouchableOpacity>
-        <ThemedText style={styles.disclaimer}>
+        <ThemedText style={[styles.disclaimer, { color: colors.textSecondary }]}>
           By continuing, you agree to our Terms of Service.
         </ThemedText>
       </View>
@@ -147,7 +144,7 @@ export default function InnovatorSurvey5Screen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG },
+  container: { flex: 1 },
   header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
@@ -155,80 +152,45 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 20,
   },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: BORDER,
-  },
-  progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
-  progressDotDone: { backgroundColor: TrustTeal },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 12,
-    lineHeight: 32,
-  },
-  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
+  progressDot: { width: 8, height: 8, borderRadius: 4 },
+  progressDotActive: { width: 24, borderRadius: 4 },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 12, lineHeight: 32 },
+  subtitle: { fontSize: 16, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   optionCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: CARD_BG,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: BORDER,
     padding: 18,
     marginBottom: 16,
     minHeight: 96,
-  },
-  optionCardSelected: {
-    borderColor: TrustTeal,
-    borderWidth: 2,
-    backgroundColor: CARD_SELECTED_BG,
   },
   cardIconWrap: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "rgba(255,255,255,0.06)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
   },
   cardTextWrap: { flex: 1, marginRight: 12 },
-  optionLabel: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 4,
-  },
-  optionDescription: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    lineHeight: 18,
-  },
+  optionLabel: { fontSize: 18, fontWeight: "700", marginBottom: 4 },
+  optionDescription: { fontSize: 13, lineHeight: 18 },
   radioCircle: {
     width: 28,
     height: 28,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
-  },
-  radioCircleSelected: {
-    backgroundColor: TrustTeal,
-    borderColor: TrustTeal,
   },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: TrustTeal,
     borderRadius: 12,
     paddingVertical: 18,
     paddingHorizontal: 32,
@@ -239,12 +201,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
-  disclaimer: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    textAlign: "center",
-    lineHeight: 18,
-  },
+  disclaimer: { fontSize: 13, textAlign: "center", lineHeight: 18 },
 });

@@ -1,5 +1,5 @@
 import { ThemedText } from '@/components/themed-text';
-import { Colors, TEXT_SECONDARY, TrustTeal } from '@/constants/theme';
+import { Colors, TEXT_SECONDARY } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from 'expo-router';
@@ -18,16 +18,16 @@ export default function WelcomeScreen() {
         showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {/* Hero icon */}
-          <View style={styles.iconWrap}>
+            <View style={[styles.iconWrap, { backgroundColor: colors.secondary + "20" }]}>
             <MaterialCommunityIcons
               name="hand-heart"
               size={56}
-              color={TrustTeal}
+              color={colors.secondary}
             />
           </View>
 
           {/* Logo / brand */}
-          <ThemedText style={styles.logoText}>Agetech Connect</ThemedText>
+          <ThemedText style={[styles.logoText, { color: colors.tint }]}>Agetech Connect</ThemedText>
 
           {/* Main heading */}
           <ThemedText style={styles.heading}>
@@ -42,15 +42,15 @@ export default function WelcomeScreen() {
           {/* Feature bullets */}
           <View style={styles.features}>
             <View style={styles.featureRow}>
-              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <MaterialCommunityIcons name="check-circle" size={22} color={colors.accent} style={styles.featureIcon} />
               <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Match with caregivers & innovators</ThemedText>
             </View>
             <View style={styles.featureRow}>
-              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <MaterialCommunityIcons name="check-circle" size={22} color={colors.secondary} style={styles.featureIcon} />
               <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Personalized tech recommendations</ThemedText>
             </View>
             <View style={styles.featureRow}>
-              <MaterialCommunityIcons name="check-circle" size={22} color={TrustTeal} style={styles.featureIcon} />
+              <MaterialCommunityIcons name="check-circle" size={22} color={colors.secondary} style={styles.featureIcon} />
               <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>Trusted, secure platform</ThemedText>
             </View>
           </View>
@@ -61,17 +61,17 @@ export default function WelcomeScreen() {
           {/* CTA Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.primaryButton}
+              style={[styles.primaryButton, { backgroundColor: colors.tint }]}
               onPress={() => router.push('./signup' as any)}
               activeOpacity={0.8}>
               <ThemedText style={styles.primaryButtonText}>Sign Up</ThemedText>
               <MaterialCommunityIcons name="arrow-right" size={22} color="#FFFFFF" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.outlineButton}
+              style={[styles.outlineButton, { borderColor: colors.secondary }]}
               onPress={() => router.push('./login' as any)}
               activeOpacity={0.8}>
-              <ThemedText style={styles.outlineButtonText}>Log In</ThemedText>
+              <ThemedText style={[styles.outlineButtonText, { color: colors.secondary }]}>Log In</ThemedText>
             </TouchableOpacity>
           </View>
         </View>
@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 22,
     fontWeight: '700',
-    color: TrustTeal,
     textAlign: 'center',
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -152,7 +151,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: TrustTeal,
     borderRadius: 999,
     paddingVertical: 18,
     paddingHorizontal: 32,

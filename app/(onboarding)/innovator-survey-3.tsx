@@ -2,22 +2,15 @@
  * Innovators & Companies: C. Technology Category - Multi-select
  */
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const BG = "#1a1f2e";
-const CARD_BG = "#364652";
-const BORDER = "#3d4f5f";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-const CARD_BORDER = TrustTeal;
-const ICON_TINT = "#5b9aa0";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
@@ -36,6 +29,8 @@ const TOTAL_STEPS = 5;
 const STEP = 3;
 
 export default function InnovatorSurvey3Screen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const { state, setInnovatorTechnologyCategories } = useOnboardingSurvey();
   const [selected, setSelected] = useState<string[]>(
     state.innovatorTechnologyCategories,
@@ -53,7 +48,7 @@ export default function InnovatorSurvey3Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <View style={styles.progressRow}>
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -61,16 +56,16 @@ export default function InnovatorSurvey3Screen() {
               key={i}
               style={[
                 styles.progressDot,
+                { backgroundColor: i < STEP || i + 1 === STEP ? colors.accent : colors.border },
                 i + 1 === STEP && styles.progressDotActive,
-                i < STEP && styles.progressDotDone,
               ]}
             />
           ))}
         </View>
-        <ThemedText style={styles.title}>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
           What category best describes your solution?
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Select all that apply.
         </ThemedText>
       </View>
@@ -86,26 +81,27 @@ export default function InnovatorSurvey3Screen() {
               key={label}
               style={[
                 styles.optionCard,
-                selected.includes(label) && styles.optionCardSelected,
+                { backgroundColor: colors.cardBackground, borderColor: colors.border },
+                selected.includes(label) && { borderColor: colors.selectedOutline, borderWidth: 2, backgroundColor: colors.selectedFill },
               ]}
               onPress={() => toggle(label)}
               activeOpacity={0.8}
             >
               {selected.includes(label) && (
-                <View style={styles.checkBadge}>
-                  <MaterialIcons name="check" size={14} color="#FFFFFF" />
+                <View style={[styles.checkBadge, { backgroundColor: colors.accent }]}>
+                  <MaterialIcons name="check" size={14} color={colors.tint} />
                 </View>
               )}
               <MaterialCommunityIcons
                 name={icon}
                 size={32}
-                color={selected.includes(label) ? TrustTeal : ICON_TINT}
+                color={selected.includes(label) ? colors.tint : colors.textSecondary}
                 style={styles.optionIcon}
               />
-              <ThemedText style={styles.optionLabel} numberOfLines={2}>
+              <ThemedText style={[styles.optionLabel, { color: colors.text }]} numberOfLines={2}>
                 {label}
               </ThemedText>
-              <ThemedText style={styles.optionDescription} numberOfLines={2}>
+              <ThemedText style={[styles.optionDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                 {description}
               </ThemedText>
             </TouchableOpacity>
@@ -117,7 +113,7 @@ export default function InnovatorSurvey3Screen() {
         <TouchableOpacity
           style={[
             styles.continueBtn,
-            selected.length === 0 && styles.continueBtnDisabled,
+            { backgroundColor: selected.length > 0 ? colors.tint : colors.border },
           ]}
           onPress={handleContinue}
           disabled={selected.length === 0}
@@ -132,7 +128,7 @@ export default function InnovatorSurvey3Screen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG },
+  container: { flex: 1 },
   header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
@@ -140,22 +136,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 20,
   },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: BORDER,
-  },
-  progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
-  progressDotDone: { backgroundColor: TrustTeal },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 10,
-    lineHeight: 32,
-  },
-  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
+  progressDot: { width: 8, height: 8, borderRadius: 4 },
+  progressDotActive: { width: 24, borderRadius: 4 },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 10, lineHeight: 32 },
+  subtitle: { fontSize: 16, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   cardGrid: {
@@ -166,17 +150,14 @@ const styles = StyleSheet.create({
   optionCard: {
     width: "48%",
     aspectRatio: 1,
-    backgroundColor: CARD_BG,
     borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: CARD_BORDER,
     padding: 16,
     marginBottom: 16,
     alignItems: "center",
     justifyContent: "flex-start",
     position: "relative",
   },
-  optionCardSelected: { borderColor: TrustTeal, borderWidth: 2 },
   checkBadge: {
     position: "absolute",
     top: 12,
@@ -184,30 +165,17 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: TrustTeal,
     alignItems: "center",
     justifyContent: "center",
   },
   optionIcon: { marginTop: 8, marginBottom: 10 },
-  optionLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  optionDescription: {
-    fontSize: 11,
-    color: TEXT_SECONDARY,
-    textAlign: "center",
-    lineHeight: 14,
-  },
+  optionLabel: { fontSize: 14, fontWeight: "700", textAlign: "center", marginBottom: 4 },
+  optionDescription: { fontSize: 11, textAlign: "center", lineHeight: 14 },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: TrustTeal,
     borderRadius: 999,
     paddingVertical: 18,
     paddingHorizontal: 32,
@@ -218,6 +186,5 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
 });

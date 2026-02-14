@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
@@ -14,15 +15,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// Onboarding colors - background #1a1f2e
-const BG = "#1a1f2e";
-const CARD_BG = "#364652";
-const CARD_BG_SELECTED = "rgba(0,128,128,0.12)";
-const BORDER = "#3d4f5f";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-const ICON_TINT = "#5b9aa0";
 
 type UserType = "caregiver" | "facility" | "innovator" | null;
 
@@ -39,7 +31,7 @@ const OPTIONS: Array<{
     description:
       "Looking for tools for aging parents, dementia care, loneliness, safety, monitoring, etc.",
     icon: "heart-outline",
-    image: require("@/assets/images/icon.png"),
+    image: require("@/assets/images/selector_page/family.jpg"),
   },
   {
     id: "facility",
@@ -47,7 +39,7 @@ const OPTIONS: Array<{
     description:
       "Long-term care, assisted living, retirement homes, home-care agencies.",
     icon: "domain",
-    image: require("@/assets/images/splash-icon.png"),
+    image: require("@/assets/images/selector_page/carefacilities.jpg"),
   },
   {
     id: "innovator",
@@ -55,11 +47,13 @@ const OPTIONS: Array<{
     description:
       "Startups and mature companies offering products/services for aging populations.",
     icon: "lightbulb-outline",
-    image: require("@/assets/images/react-logo.png"),
+    image: require("@/assets/images/selector_page/companies.jpg"),
   },
 ];
 
 export default function UserTypeScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const [selectedType, setSelectedType] = useState<UserType>(null);
   const { setUserType } = useOnboardingSurvey();
 
@@ -75,19 +69,19 @@ export default function UserTypeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       {/* Fixed Header */}
       <View style={styles.header}>
         <View style={styles.progressRow}>
-          <View style={[styles.progressDot, styles.progressDotActive]} />
+          <View style={[styles.progressDot, styles.progressDotActive, { backgroundColor: colors.accent }]} />
           {[1, 2, 3, 4].map((i) => (
-            <View key={i} style={styles.progressDot} />
+            <View key={i} style={[styles.progressDot, { backgroundColor: colors.border }]} />
           ))}
         </View>
-        <ThemedText type="title" style={styles.title}>
+        <ThemedText type="title" style={[styles.title, { color: colors.text }]}>
           How will you use AgeTech Connect?
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Choose your profile type to customize your experience and start
           matching.
         </ThemedText>
@@ -105,27 +99,28 @@ export default function UserTypeScreen() {
             key={opt.id}
             style={[
               styles.optionCard,
-              selectedType === opt.id && styles.optionCardSelected,
+              { backgroundColor: colors.cardBackground, borderColor: colors.border },
+              selectedType === opt.id && { borderColor: colors.selectedOutline, borderWidth: 2, backgroundColor: colors.selectedFill },
             ]}
             onPress={() => setSelectedType(opt.id)}
             activeOpacity={0.8}
           >
             <View style={styles.optionLeft}>
-              <View style={styles.optionIconWrap}>
+              <View style={[styles.optionIconWrap, { backgroundColor: colors.secondary + "20" }]}>
                 <MaterialCommunityIcons
                   name={opt.icon}
                   size={28}
-                  color={selectedType === opt.id ? TrustTeal : ICON_TINT}
+                  color={selectedType === opt.id ? colors.tint : colors.textSecondary}
                 />
               </View>
               <View style={styles.optionTextWrap}>
-                <ThemedText style={styles.optionTitle}>{opt.title}</ThemedText>
-                <ThemedText style={styles.optionDescription}>
+                <ThemedText style={[styles.optionTitle, { color: colors.text }]}>{opt.title}</ThemedText>
+                <ThemedText style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   {opt.description}
                 </ThemedText>
               </View>
             </View>
-            <View style={styles.optionImageWrap}>
+            <View style={[styles.optionImageWrap, { backgroundColor: colors.border }]}>
               <Image
                 source={opt.image}
                 style={styles.optionImage}
@@ -142,10 +137,10 @@ export default function UserTypeScreen() {
           <MaterialIcons
             name="info-outline"
             size={20}
-            color={ICON_TINT}
+            color={colors.textSecondary}
             style={styles.infoIcon}
           />
-          <ThemedText style={styles.infoText}>
+          <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
             Don't worry, you can change your account type later in the settings.
             Your selection helps us show you the most relevant innovations.
           </ThemedText>
@@ -153,7 +148,7 @@ export default function UserTypeScreen() {
         <TouchableOpacity
           style={[
             styles.continueButton,
-            !selectedType && styles.continueButtonDisabled,
+            { backgroundColor: selectedType ? colors.tint : colors.border },
           ]}
           onPress={handleContinue}
           disabled={!selectedType}
@@ -168,10 +163,7 @@ export default function UserTypeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BG,
-  },
+  container: { flex: 1 },
   header: {
     paddingHorizontal: 24,
     paddingTop: 40,
@@ -189,27 +181,21 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: BORDER,
   },
   progressDotActive: {
     width: 24,
     borderRadius: 4,
-    backgroundColor: TrustTeal,
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: TEXT_PRIMARY,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: TEXT_SECONDARY,
     lineHeight: 22,
   },
-  scrollView: {
-    flex: 1,
-  },
+  scrollView: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 24,
     paddingTop: 16,
@@ -219,10 +205,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: CARD_BG,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: BORDER,
     padding: 20,
     marginBottom: 14,
     minHeight: 108,
@@ -236,11 +220,6 @@ const styles = StyleSheet.create({
       android: { elevation: 3 },
     }),
   },
-  optionCardSelected: {
-    borderColor: TrustTeal,
-    borderWidth: 2,
-    backgroundColor: CARD_BG_SELECTED,
-  },
   optionLeft: {
     flex: 1,
     flexDirection: "row",
@@ -251,31 +230,25 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "rgba(0,128,128,0.18)",
     alignItems: "center",
     justifyContent: "center",
   },
-  optionTextWrap: {
-    flex: 1,
-  },
+  optionTextWrap: { flex: 1 },
   optionTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: TEXT_PRIMARY,
     marginBottom: 6,
   },
   optionDescription: {
     fontSize: 14,
-    color: TEXT_SECONDARY,
     lineHeight: 20,
   },
   optionImageWrap: {
-    width: 64,
-    height: 64,
+    width: 80,
+    height: 80,
     borderRadius: 20,
     overflow: "hidden",
     marginLeft: 14,
-    backgroundColor: BORDER,
   },
   optionImage: {
     width: "100%",
@@ -285,7 +258,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 24,
-    borderTopWidth: 0,
   },
   infoBlock: {
     flexDirection: "row",
@@ -293,27 +265,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     gap: 10,
   },
-  infoIcon: {
-    marginTop: 2,
-  },
+  infoIcon: { marginTop: 2 },
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: TEXT_SECONDARY,
     lineHeight: 20,
   },
   continueButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: TrustTeal,
     borderRadius: 14,
     paddingVertical: 18,
     gap: 10,
-  },
-  continueButtonDisabled: {
-    backgroundColor: BORDER,
-    opacity: 0.8,
   },
   continueButtonText: {
     fontSize: 17,

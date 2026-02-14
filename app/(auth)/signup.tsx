@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { AUTH_BG, Colors, TechBlue, TEXT_PRIMARY, TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -92,14 +92,14 @@ export default function SignUpScreen() {
 
           {/* Brand section: icon + title + tagline */}
           <View style={styles.brandSection}>
-            <View style={styles.iconCircle}>
+            <View style={[styles.iconCircle, { backgroundColor: colors.secondary + "20" }]}>
               <MaterialCommunityIcons
                 name="account-group"
                 size={48}
-                color="#5b9aa0"
+                color={colors.secondary}
               />
             </View>
-            <ThemedText type="title" style={styles.brandTitle}>
+            <ThemedText type="title" style={[styles.brandTitle, { color: colors.text }]}>
               Join AgeTech Connect
             </ThemedText>
             <ThemedText style={[styles.tagline, { color: colors.textSecondary }]}>
@@ -114,12 +114,12 @@ export default function SignUpScreen() {
               size={22}
               color={colors.text}
             />
-            <ThemedText style={styles.socialButtonText}>
+            <ThemedText style={[styles.socialButtonText, { color: colors.text }]}>
               Continue with Google
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.appleButton, { backgroundColor: colors.backgroundSecondary }]} activeOpacity={0.8}>
-            <MaterialCommunityIcons name="apple" size={22} color="#000000" />
+            <MaterialCommunityIcons name="apple" size={22} color={colors.text} />
             <ThemedText style={[styles.appleButtonText, { color: colors.text }]}>
               Continue with Apple
             </ThemedText>
@@ -128,14 +128,14 @@ export default function SignUpScreen() {
           {/* Separator */}
           <View style={styles.separatorRow}>
             <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
-            <ThemedText style={styles.separatorText}>
+            <ThemedText style={[styles.separatorText, { color: colors.textSecondary }]}>
               OR SIGN UP WITH EMAIL
             </ThemedText>
             <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
           </View>
 
           {/* Full Name field */}
-          <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: errors.name ? colors.error : colors.border }]}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground, borderColor: errors.name ? colors.error : colors.border }]}>
             <MaterialIcons
               name="person-outline"
               size={22}
@@ -156,7 +156,7 @@ export default function SignUpScreen() {
           ) : null}
 
           {/* Email field */}
-          <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: errors.email ? colors.error : colors.border }]}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground, borderColor: errors.email ? colors.error : colors.border }]}>
             <MaterialIcons
               name="mail-outline"
               size={22}
@@ -179,7 +179,7 @@ export default function SignUpScreen() {
           ) : null}
 
           {/* Password field */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground, borderColor: errors.password ? colors.error : colors.border }]}>
             <MaterialIcons
               name="lock-outline"
               size={22}
@@ -215,7 +215,7 @@ export default function SignUpScreen() {
           ) : null}
 
           {/* Confirm Password field */}
-          <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: errors.confirmPassword ? colors.error : colors.border }]}>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground, borderColor: errors.confirmPassword ? colors.error : colors.border }]}>
             <MaterialIcons
               name="lock-outline"
               size={22}
@@ -254,7 +254,7 @@ export default function SignUpScreen() {
 
           {/* Primary CTA */}
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, { backgroundColor: colors.tint }]}
             onPress={handleSignUp}
             activeOpacity={0.8}
           >
@@ -265,11 +265,11 @@ export default function SignUpScreen() {
 
           {/* Log in prompt */}
           <View style={styles.footerPrompt}>
-            <ThemedText style={styles.footerText}>
+            <ThemedText style={[styles.footerText, { color: colors.textSecondary }]}>
               Already have an account?{" "}
             </ThemedText>
             <TouchableOpacity onPress={() => router.push("./login" as any)}>
-              <ThemedText style={styles.footerLink}>Log In</ThemedText>
+              <ThemedText style={[styles.footerLink, { color: colors.secondary }]}>Log In</ThemedText>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -281,7 +281,6 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AUTH_BG,
   },
   keyboardView: {
     flex: 1,
@@ -316,7 +315,6 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: TechBlue,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -324,7 +322,6 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: TEXT_PRIMARY,
     textAlign: "center",
     marginBottom: 8,
   },
@@ -348,7 +345,6 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: TEXT_PRIMARY,
   },
   appleButton: {
     flexDirection: "row",
@@ -363,7 +359,6 @@ const styles = StyleSheet.create({
   appleButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000000",
   },
   separatorRow: {
     flexDirection: "row",
@@ -396,7 +391,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 0,
     fontSize: 16,
-    color: TEXT_PRIMARY,
     minHeight: 54,
   },
   inputRightPadding: {
@@ -416,7 +410,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: TrustTeal,
     borderRadius: 14,
     paddingVertical: 18,
     alignItems: "center",
@@ -440,6 +433,5 @@ const styles = StyleSheet.create({
   footerLink: {
     fontSize: 15,
     fontWeight: "600",
-    color: TrustTeal,
   },
 });

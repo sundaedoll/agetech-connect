@@ -1,83 +1,94 @@
 /**
- * Professional, calm color palette for Agetech Connect
- * Healthcare-adjacent, trustworthy, accessible design
+ * AgeTech Connect – blue + light background, yellow for accents
+ *
+ * Role map:
+ * - Main CTA: #196795
+ * - Secondary (links, icons): #3F92C3
+ * - Selected outline: #F1B000 (box borders)
+ * - Selected fill: (muted golden – for selected box background)
+ * - Accent: #F1B000 (progress, badges)
+ * - Background: #F4FAFF, Card: #FFFCF2
  */
 
 import { Platform } from "react-native";
 
-// Auth / branding colors (from design spec)
-export const TrustTeal = "#008080"; // Primary buttons, progress bars, active states
-export const TechBlue = "#2C3E50"; // Primary headings, navigation icons
-
-// Shared text/background constants (for static styles)
-export const TEXT_PRIMARY = "#000000";
-export const TEXT_SECONDARY = "#454545";
-export const AUTH_BG = "#FFFFFF";
-
-// Light theme color scheme
-export const LightThemeColors = {
-  black: "#000000",
-  darkTeal: "#196795",
-  mediumBlue: "#3F92C3",
-  darkGray: "#454545",
-  lightTeal: "#9DD2D7",
-  lightGray: "#EAEAEA",
-  gold: "#F1B000",
-  lightBlue: "#F4FAFF",
-  offWhite: "#F8F8F8",
-  yellow: "#FFCC41",
-  cream: "#FFFCF2",
-  white: "#FFFFFF",
+export const Palette = {
+  darkBlue: "#196795", // Main CTA, headings
+  mediumBlue: "#3F92C3", // Links, secondary actions, input focus
+  lightBlue: "#9DD2D7", // Borders, inactive, progress track
+  outline: "#F1B000", // Selected box outline, progress, badges
+  fill: "#FFE100", // Selected box fill (light mode)
+  fillDark: "#8B6914", // Selected box fill – dark yellow (dark mode)
+  warmBg: "#FFFCF2", // Card / form background
+  coolBg: "#F4FAFF", // Main app background
 } as const;
 
-// Primary accent color - calm, professional blue
-const primaryColor = "#2563EB"; // Trustworthy blue
-const primaryColorDark = "#3B82F6";
+export const TrustTeal = Palette.darkBlue;
+export const TechBlue = Palette.darkBlue;
+export const AUTH_BG = Palette.coolBg;
+export const TEXT_PRIMARY = "#000000";
+export const TEXT_SECONDARY = "#454545";
+
+export const LightThemeColors = {
+  black: "#000000",
+  white: "#FFFFFF",
+  darkGray: "#454545",
+  lightGray: "#E5E5E5",
+  ...Palette,
+} as const;
 
 export const Colors = {
   light: {
-    text: LightThemeColors.black,
-    textSecondary: LightThemeColors.darkGray,
-    background: LightThemeColors.white,
-    backgroundSecondary: LightThemeColors.offWhite,
-    tint: LightThemeColors.darkTeal,
-    icon: LightThemeColors.darkGray,
-    tabIconDefault: LightThemeColors.darkGray,
-    tabIconSelected: LightThemeColors.darkTeal,
-    border: LightThemeColors.lightGray,
-    cardBackground: LightThemeColors.white,
-    shadow: "rgba(0, 0, 0, 0.1)",
-    // Status colors
-    success: LightThemeColors.darkTeal,
-    warning: LightThemeColors.gold,
+    text: "#000000",
+    textSecondary: "#454545",
+    background: Palette.coolBg,
+    backgroundSecondary: Palette.warmBg,
+    tint: Palette.darkBlue,
+    secondary: Palette.mediumBlue,
+    selectedOutline: Palette.outline,
+    selectedFill: Palette.fill,
+    accent: Palette.outline,
+    icon: "#454545",
+    tabIconDefault: "#454545",
+    tabIconSelected: Palette.darkBlue,
+    border: Palette.lightBlue,
+    cardBackground: Palette.warmBg,
+    inputBackground: "#FFFFFF",
+    inputFocusBorder: Palette.mediumBlue,
+    shadow: "rgba(0, 0, 0, 0.08)",
+    success: Palette.mediumBlue,
+    warning: Palette.outline,
     error: "#EF4444",
-    // Stage badges
-    pilot: LightThemeColors.lightTeal,
-    earlyCommercial: LightThemeColors.mediumBlue,
-    mature: LightThemeColors.darkTeal,
-    // Extended light theme palette (for custom use)
+    pilot: Palette.outline,
+    earlyCommercial: Palette.mediumBlue,
+    mature: Palette.darkBlue,
     ...LightThemeColors,
   },
   dark: {
     text: "#F9FAFB",
-    textSecondary: "#D1D5DB",
-    background: "#111827",
-    backgroundSecondary: "#1F2937",
-    tint: primaryColorDark,
+    textSecondary: "#E5E7EB",
+    background: "#0A0A0A",
+    backgroundSecondary: "#171717",
+    tint: Palette.darkBlue,
+    secondary: Palette.mediumBlue,
+    selectedOutline: Palette.outline,
+    selectedFill: Palette.fillDark,
+    accent: Palette.outline,
     icon: "#9CA3AF",
     tabIconDefault: "#6B7280",
-    tabIconSelected: primaryColorDark,
-    border: "#374151",
-    cardBackground: "#1F2937",
-    shadow: "rgba(0, 0, 0, 0.3)",
-    // Status colors
-    success: "#10B981",
-    warning: "#F59E0B",
+    tabIconSelected: Palette.mediumBlue,
+    border: "#2A2A2A",
+    cardBackground: "#171717",
+    inputBackground: "#1F1F1F",
+    inputFocusBorder: Palette.mediumBlue,
+    shadow: "rgba(0, 0, 0, 0.4)",
+    success: Palette.mediumBlue,
+    warning: Palette.outline,
     error: "#EF4444",
-    // Stage badges
-    pilot: "#A78BFA",
-    earlyCommercial: "#60A5FA",
-    mature: "#34D399",
+    pilot: Palette.outline,
+    earlyCommercial: Palette.mediumBlue,
+    mature: Palette.lightBlue,
+    ...LightThemeColors,
   },
 };
 

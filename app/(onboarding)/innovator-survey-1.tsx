@@ -3,21 +3,15 @@
  * Unique design: stage journey timeline with numbered nodes and descriptions
  */
 import { ThemedText } from "@/components/themed-text";
-import { TrustTeal } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { useOnboardingSurvey } from "@/contexts/onboarding-survey";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const BG = "#1a1f2e";
-const BORDER = "#3d4f5f";
-const CARD_BG = "#252d3a";
-const TEXT_PRIMARY = "#FFFFFF";
-const TEXT_SECONDARY = "#9CA3AF";
-const CARD_BORDER = TrustTeal;
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
@@ -47,6 +41,8 @@ const TOTAL_STEPS = 5;
 const STEP = 1;
 
 export default function InnovatorSurvey1Screen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const { state, setTechnologyStage } = useOnboardingSurvey();
   const [selected, setSelected] = useState<string | null>(state.technologyStage);
 
@@ -58,7 +54,7 @@ export default function InnovatorSurvey1Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top", "bottom"]}>
       <View style={styles.header}>
         <View style={styles.progressRow}>
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -66,16 +62,16 @@ export default function InnovatorSurvey1Screen() {
               key={i}
               style={[
                 styles.progressDot,
+                { backgroundColor: i < STEP || i + 1 === STEP ? colors.accent : colors.border },
                 i + 1 === STEP && styles.progressDotActive,
-                i < STEP && styles.progressDotDone,
               ]}
             />
           ))}
         </View>
-        <ThemedText style={styles.title}>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
           What stage is your technology currently at?
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Select one to help us match you with the right partners.
         </ThemedText>
       </View>
@@ -98,8 +94,8 @@ export default function InnovatorSurvey1Screen() {
                   <View
                     style={[
                       styles.nodeCircle,
-                      isSelected && styles.nodeCircleSelected,
-                      isPast && !isSelected && styles.nodeCircleDone,
+                      { backgroundColor: colors.cardBackground, borderColor: colors.border },
+                      (isSelected || isPast) && { backgroundColor: colors.accent, borderColor: colors.accent },
                     ]}
                   >
                     {isPast && !isSelected ? (
@@ -108,7 +104,7 @@ export default function InnovatorSurvey1Screen() {
                       <ThemedText
                         style={[
                           styles.nodeNum,
-                          isSelected && styles.nodeNumSelected,
+                          { color: isSelected ? "#FFFFFF" : colors.textSecondary },
                         ]}
                       >
                         {stepNum}
@@ -119,7 +115,8 @@ export default function InnovatorSurvey1Screen() {
                     <View
                       style={[
                         styles.trackLine,
-                        lineActive && styles.trackLineActive,
+                        { backgroundColor: colors.border },
+                        lineActive && { backgroundColor: colors.accent },
                       ]}
                     />
                   )}
@@ -128,27 +125,28 @@ export default function InnovatorSurvey1Screen() {
                 <TouchableOpacity
                   style={[
                     styles.stageCard,
-                    isSelected && styles.stageCardSelected,
+                    { backgroundColor: colors.cardBackground, borderColor: colors.border },
+                    isSelected && { borderColor: colors.selectedOutline, borderWidth: 2, backgroundColor: colors.selectedFill },
                   ]}
                   onPress={() => setSelected(label)}
                   activeOpacity={0.8}
                 >
-                  <View style={styles.stageIconWrap}>
+                  <View style={[styles.stageIconWrap, { backgroundColor: colors.secondary + "20" }]}>
                     <MaterialCommunityIcons
                       name={icon}
                       size={28}
-                      color={isSelected ? TrustTeal : TEXT_SECONDARY}
+                      color={isSelected ? colors.tint : colors.textSecondary}
                     />
                   </View>
                   <View style={styles.stageTextWrap}>
-                    <ThemedText style={styles.stageLabel}>{label}</ThemedText>
-                    <ThemedText style={styles.stageDescription} numberOfLines={2}>
+                    <ThemedText style={[styles.stageLabel, { color: colors.text }]}>{label}</ThemedText>
+                    <ThemedText style={[styles.stageDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                       {description}
                     </ThemedText>
                   </View>
                   {isSelected && (
                     <View style={styles.checkWrap}>
-                      <MaterialIcons name="check-circle" size={24} color={TrustTeal} />
+                      <MaterialIcons name="check-circle" size={24} color={colors.tint} />
                     </View>
                   )}
                 </TouchableOpacity>
@@ -160,7 +158,10 @@ export default function InnovatorSurvey1Screen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.continueBtn, !selected && styles.continueBtnDisabled]}
+          style={[
+            styles.continueBtn,
+            { backgroundColor: selected ? colors.tint : colors.border },
+          ]}
           onPress={handleContinue}
           disabled={!selected}
           activeOpacity={0.8}
@@ -174,7 +175,7 @@ export default function InnovatorSurvey1Screen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG },
+  container: { flex: 1 },
   header: { paddingHorizontal: 24, paddingTop: 80, paddingBottom: 20 },
   progressRow: {
     flexDirection: "row",
@@ -182,22 +183,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 20,
   },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: BORDER,
-  },
-  progressDotActive: { width: 24, borderRadius: 4, backgroundColor: TrustTeal },
-  progressDotDone: { backgroundColor: TrustTeal },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 12,
-    lineHeight: 32,
-  },
-  subtitle: { fontSize: 16, color: TEXT_SECONDARY, lineHeight: 22 },
+  progressDot: { width: 8, height: 8, borderRadius: 4 },
+  progressDotActive: { width: 24, borderRadius: 4 },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 12, lineHeight: 32 },
+  subtitle: { fontSize: 16, lineHeight: 22 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 24 },
   journeyWrap: { paddingLeft: 4 },
@@ -206,86 +195,43 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 4,
   },
-  trackCol: {
-    width: 36,
-    alignItems: "center",
-    marginRight: 12,
-  },
+  trackCol: { width: 36, alignItems: "center", marginRight: 12 },
   nodeCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: CARD_BG,
     borderWidth: 2,
-    borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
   },
-  nodeCircleSelected: {
-    backgroundColor: TrustTeal,
-    borderColor: TrustTeal,
-  },
-  nodeCircleDone: {
-    backgroundColor: TrustTeal,
-    borderColor: TrustTeal,
-  },
-  nodeNum: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: TEXT_SECONDARY,
-  },
-  nodeNumSelected: { color: "#FFFFFF" },
-  trackLine: {
-    width: 2,
-    minHeight: 56,
-    backgroundColor: BORDER,
-    marginVertical: 4,
-  },
-  trackLineActive: { backgroundColor: TrustTeal },
+  nodeNum: { fontSize: 14, fontWeight: "700" },
+  trackLine: { width: 2, minHeight: 56, marginVertical: 4 },
   stageCard: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: CARD_BG,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: BORDER,
     padding: 18,
     minHeight: 100,
-  },
-  stageCardSelected: {
-    borderColor: CARD_BORDER,
-    borderWidth: 2,
-    backgroundColor: "rgba(0, 128, 128, 0.12)",
   },
   stageIconWrap: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.06)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
   },
   stageTextWrap: { flex: 1, marginRight: 8 },
-  stageLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: TEXT_PRIMARY,
-    marginBottom: 4,
-  },
-  stageDescription: {
-    fontSize: 13,
-    color: TEXT_SECONDARY,
-    lineHeight: 18,
-  },
+  stageLabel: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
+  stageDescription: { fontSize: 13, lineHeight: 18 },
   checkWrap: { marginLeft: 4 },
   footer: { paddingHorizontal: 24, paddingVertical: 24 },
   continueBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: TrustTeal,
     borderRadius: 999,
     paddingVertical: 18,
     paddingHorizontal: 32,
@@ -296,6 +242,5 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  continueBtnDisabled: { backgroundColor: BORDER, opacity: 0.8 },
   continueBtnText: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
 });
